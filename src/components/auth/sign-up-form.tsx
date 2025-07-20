@@ -25,6 +25,10 @@ import Link from 'next/link';
 
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({
+  client_id: '857692423877-bfps7cvj3ld11pl7slqamo4ubr3sursa.apps.googleusercontent.com'
+});
+
 
 function GoogleIcon(props: React.SVGProps<SVGSVGElement>) {
   return (
