@@ -1,12 +1,13 @@
 import {initializeApp, getApps} from 'firebase/app';
 
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: 'AIzaSyBT2nM-NmZKRjvyo8Ln3tksCQd_guDvulA',
+  authDomain: 'certvault-ai.firebaseapp.com',
+  projectId: 'certvault-ai',
+  storageBucket: 'certvault-ai.appspot.com',
+  messagingSenderId: '857692423877',
+  appId: '1:857692423877:web:b35056e965c264de4fd2ac',
 };
 
 let firebaseApp;
