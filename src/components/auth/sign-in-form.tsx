@@ -5,6 +5,9 @@ import {useRouter} from 'next/navigation';
 import {
   getAuth,
   signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
   signInAnonymously,
   RecaptchaVerifier,
   signInWithPhoneNumber,
@@ -24,6 +27,7 @@ import {Label} from '@/components/ui/label';
 import {useToast} from '@/hooks/use-toast';
 import {Loader2, User} from 'lucide-react';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
+import { Icons } from '@/components/icons';
 
 const auth = getAuth(firebaseApp);
 
@@ -40,11 +44,14 @@ export default function SignInForm() {
   const [password, setPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
-  const [verificationId, setVerificationId] =
+  const [confirmationResult, setConfirmationResult] =
     useState<ConfirmationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPhoneLoading, setIsPhoneLoading] = useState(false);
   const [isCodeSent, setIsCodeSent] = useState(false);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isGuestLoading, setIsGuestLoading] = useState(false);
+  const [authMode, setAuthMode] = useState<'signin' | 'signup'>('signin');
   const router = useRouter();
   const {toast} = useToast();
 
@@ -65,20 +72,29 @@ export default function SignInForm() {
           );
         } catch (error) {
           console.error('Recaptcha Verifier error', error);
+          toast({
+            title: 'Could not initialize Phone Sign-In',
+            description: 'Please refresh the page and try again.',
+            variant: 'destructive',
+          })
         }
       }
     }, 100);
-  }, []);
+  }, [toast]);
 
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      if (authMode === 'signin') {
+        await signInWithEmailAndPassword(auth, email, password);
+      } else {
+        await createUserWithEmailAndPassword(auth, email, password);
+      }
       router.push('/dashboard');
     } catch (error: any) {
       toast({
-        title: 'Sign-in Failed',
+        title: `${authMode === 'signin' ? 'Sign-in' : 'Sign-up'} Failed`,
         description: error.message,
         variant: 'destructive',
       });
@@ -86,20 +102,37 @@ export default function SignInForm() {
       setIsLoading(false);
     }
   };
+  
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      router.push('/dashboard');
+    } catch (error: any) {
+       toast({
+        title: 'Google Sign-in Failed',
+        description: error.message,
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGoogleLoading(false);
+    }
+  };
 
   const handleAnonymousSignIn = async () => {
-    setIsLoading(true);
+    setIsGuestLoading(true);
     try {
       await signInAnonymously(auth);
       router.push('/dashboard');
     } catch (error: any) {
       toast({
         title: 'Anonymous Sign-in Failed',
-        description: error.message,
+        description: 'Please ensure Anonymous sign-in is enabled in your Firebase console.',
         variant: 'destructive',
       });
     } finally {
-      setIsLoading(false);
+      setIsGuestLoading(false);
     }
   };
 
@@ -108,12 +141,12 @@ export default function SignInForm() {
     setIsPhoneLoading(true);
     try {
       const appVerifier = window.recaptchaVerifier!;
-      const confirmationResult = await signInWithPhoneNumber(
+      const result = await signInWithPhoneNumber(
         auth,
         phoneNumber,
         appVerifier
       );
-      setVerificationId(confirmationResult);
+      setConfirmationResult(result);
       setIsCodeSent(true);
       toast({
         title: 'Verification Code Sent',
@@ -125,11 +158,11 @@ export default function SignInForm() {
         description: error.message,
         variant: 'destructive',
       });
-      // Reset reCAPTCHA
+      // Reset reCAPTCHA if it exists
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.render().then(widgetId => {
           // @ts-ignore
-          window.grecaptcha.reset(widgetId);
+          window.grecaptcha?.reset(widgetId);
         });
       }
     } finally {
@@ -139,10 +172,10 @@ export default function SignInForm() {
 
   const handleVerifyCode = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!verificationId) return;
+    if (!confirmationResult) return;
     setIsPhoneLoading(true);
     try {
-      await verificationId.confirm(verificationCode);
+      await confirmationResult.confirm(verificationCode);
       router.push('/dashboard');
     } catch (error: any) {
       toast({
@@ -158,9 +191,9 @@ export default function SignInForm() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <CardTitle className="text-2xl">Sign In</CardTitle>
+        <CardTitle className="text-2xl">Welcome</CardTitle>
         <CardDescription>
-          Choose your preferred sign-in method below.
+          Sign in or create an account to continue.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -170,7 +203,25 @@ export default function SignInForm() {
             <TabsTrigger value="phone">Phone</TabsTrigger>
           </TabsList>
           <TabsContent value="email">
-            <form onSubmit={handleSignIn} className="grid gap-4 pt-4">
+            <form onSubmit={handleEmailAuth} className="grid gap-4 pt-4">
+               <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant={authMode === 'signin' ? 'default' : 'outline'}
+                  onClick={() => setAuthMode('signin')}
+                  disabled={isLoading}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  type="button"
+                  variant={authMode === 'signup' ? 'default' : 'outline'}
+                  onClick={() => setAuthMode('signup')}
+                  disabled={isLoading}
+                >
+                  Sign Up
+                </Button>
+              </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -196,7 +247,7 @@ export default function SignInForm() {
               </div>
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In with Email
+                {authMode === 'signin' ? 'Sign In' : 'Create Account'}
               </Button>
             </form>
           </TabsContent>
@@ -264,19 +315,34 @@ export default function SignInForm() {
             </span>
           </div>
         </div>
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleAnonymousSignIn}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <User className="mr-2 h-4 w-4" />
-          )}
-          Continue as Guest
-        </Button>
+         <div className="grid gap-2">
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleGoogleSignIn}
+            disabled={isGoogleLoading || isLoading || isPhoneLoading || isGuestLoading}
+          >
+            {isGoogleLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <Icons.logo className="mr-2 h-4 w-4" /> // Replace with a Google icon if you have one
+            )}
+            Continue with Google
+          </Button>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={handleAnonymousSignIn}
+            disabled={isGuestLoading || isLoading || isPhoneLoading || isGoogleLoading}
+          >
+            {isGuestLoading ? (
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <User className="mr-2 h-4 w-4" />
+            )}
+            Continue as Guest
+          </Button>
+        </div>
       </CardContent>
       <div id="recaptcha-container"></div>
     </Card>
