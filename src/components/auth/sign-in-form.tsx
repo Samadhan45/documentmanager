@@ -105,8 +105,8 @@ export default function SignInForm() {
   
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
+    const provider = new GoogleAuthProvider();
     try {
-      const provider = new GoogleAuthProvider();
       await signInWithPopup(auth, provider);
       router.push('/dashboard');
     } catch (error: any) {
@@ -325,7 +325,7 @@ export default function SignInForm() {
             {isGoogleLoading ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
-              <Icons.logo className="mr-2 h-4 w-4" /> // Replace with a Google icon if you have one
+              <Icons.logo className="mr-2 h-4 w-4" /> 
             )}
             Continue with Google
           </Button>

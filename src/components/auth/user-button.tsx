@@ -45,6 +45,9 @@ export function UserButton() {
     if (user.isAnonymous) {
       return <User />;
     }
+    if (user.displayName) {
+        return user.displayName.charAt(0).toUpperCase();
+    }
     if (user.email) {
       return user.email.charAt(0).toUpperCase();
     }
@@ -55,14 +58,14 @@ export function UserButton() {
     if (user.isAnonymous) {
       return 'Guest User';
     }
-    return user.displayName || 'User';
+    return user.displayName || user.email || 'User';
   }
 
   const getDisplayIdentifier = () => {
     if (user.isAnonymous) {
       return `ID: ${user.uid.substring(0, 6)}...`;
     }
-    return user.email;
+    return user.email || user.phoneNumber;
   }
 
 
