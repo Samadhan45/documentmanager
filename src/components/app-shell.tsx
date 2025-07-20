@@ -11,15 +11,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import {
-  Book,
-  File,
-  Home,
-  Plus,
-  Search,
-  Settings,
-  Shield,
-} from 'lucide-react';
+import {Home, Loader2, Plus, Search} from 'lucide-react';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button} from './ui/button';
 import {Input} from './ui/input';
@@ -42,15 +34,26 @@ import {
   extractKeyInfo,
   type ExtractKeyInfoInput,
 } from '@/ai/flows/extract-key-info';
+import {
+  documentSearch,
+  type DocumentSearchInput,
+} from '@/ai/flows/document-search';
 import DocumentViewSheet from './document-view-sheet';
 
 const STORAGE_KEY = 'certvault-ai-documents';
+
+type SearchResult = {
+  documentId: string;
+  relevanceScore: number;
+};
 
 export default function AppShell() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [activeCategory, setActiveCategory] =
     useState<DocumentCategory | 'All'>('All');
   const [isUploadDialogOpen, setUploadDialogOpen] = useState(false);
@@ -84,6 +87,43 @@ export default function AppShell() {
       }
     }
   }, [documents, isLoading]);
+
+  useEffect(() => {
+    if (!searchQuery) {
+      setSearchResults([]);
+      setIsSearching(false);
+      return;
+    }
+
+    setIsSearching(true);
+    const handler = setTimeout(async () => {
+      try {
+        const input: DocumentSearchInput = {
+          query: searchQuery,
+          documentSummaries: documents.map(doc => ({
+            documentId: doc.id,
+            summary: doc.metadata.summary,
+          })),
+        };
+        const {results} = await documentSearch(input);
+        setSearchResults(results);
+      } catch (error) {
+        console.error('AI search failed:', error);
+        toast({
+          title: 'Search Failed',
+          description: 'The AI search could not be completed. Please try again.',
+          variant: 'destructive',
+        });
+        setSearchResults([]);
+      } finally {
+        setIsSearching(false);
+      }
+    }, 500); // Debounce search
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [searchQuery, documents, toast]);
 
   const handleFileUpload = useCallback(
     async (file: File) => {
@@ -148,17 +188,41 @@ export default function AppShell() {
     [toast]
   );
 
-  const filteredDocuments = useMemo(() => {
-    return documents.filter(doc => {
-      const matchesCategory =
-        activeCategory === 'All' || doc.category === activeCategory;
-      const matchesSearch =
-        !searchQuery ||
-        doc.fileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.metadata.summary.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesCategory && matchesSearch;
+  const handleDeleteDocument = useCallback((documentId: string) => {
+    setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+    setActiveDocument(null);
+    toast({
+      title: 'Document Deleted',
+      description: 'The document has been successfully deleted.',
     });
-  }, [documents, activeCategory, searchQuery]);
+  }, [toast]);
+
+  const filteredDocuments = useMemo(() => {
+    let docs = documents;
+
+    if (searchQuery && searchResults.length > 0) {
+      const rankedDocs = new Map(
+        searchResults.map((res, index) => [res.documentId, index])
+      );
+      docs = [...documents].sort((a, b) => {
+        const rankA = rankedDocs.get(a.id);
+        const rankB = rankedDocs.get(b.id);
+        if (rankA === undefined && rankB === undefined) return 0;
+        if (rankA === undefined) return 1;
+        if (rankB === undefined) return -1;
+        return rankA - rankB;
+      });
+      // Filter out documents that are not in the search results
+      docs = docs.filter(doc => rankedDocs.has(doc.id));
+    } else if (searchQuery) {
+      // If there's a search query but no results (e.g., during search), show empty
+       return [];
+    }
+
+    return docs.filter(
+      doc => activeCategory === 'All' || doc.category === activeCategory
+    );
+  }, [documents, activeCategory, searchQuery, searchResults]);
 
   return (
     <SidebarProvider>
@@ -213,10 +277,11 @@ export default function AppShell() {
           <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
             <div className="flex items-center gap-2">
               <SidebarTrigger className="md:hidden" />
-              <div className="relative hidden w-full max-w-sm md:block">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <div className="relative hidden w-full max-w-sm items-center md:flex">
+                <Search className="absolute left-3 text-muted-foreground" />
+                {isSearching && <Loader2 className="absolute right-3 animate-spin" />}
                 <Input
-                  placeholder="Search documents..."
+                  placeholder="Ask about your documents..."
                   className="pl-10"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
@@ -242,10 +307,11 @@ export default function AppShell() {
           <main className="flex-1 p-4 sm:p-6">
             <div className="mb-4 flex items-center justify-between">
               <h1 className="text-2xl font-bold">{activeCategory}</h1>
-              <div className="relative block w-full max-w-sm md:hidden">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <div className="relative flex w-full max-w-sm items-center md:hidden">
+                <Search className="absolute left-3 text-muted-foreground" />
+                 {isSearching && <Loader2 className="absolute right-3 animate-spin" />}
                 <Input
-                  placeholder="Search documents..."
+                  placeholder="Ask about your documents..."
                   className="pl-10"
                   value={searchQuery}
                   onChange={e => setSearchQuery(e.target.value)}
@@ -255,7 +321,9 @@ export default function AppShell() {
             <DocumentList
               documents={filteredDocuments}
               isLoading={isLoading || isUploading}
+              isSearching={isSearching && !!searchQuery}
               onSelectDocument={doc => setActiveDocument(doc)}
+              searchQuery={searchQuery}
             />
           </main>
         </SidebarInset>
@@ -264,6 +332,7 @@ export default function AppShell() {
         document={activeDocument}
         isOpen={!!activeDocument}
         onOpenChange={() => setActiveDocument(null)}
+        onDelete={handleDeleteDocument}
       />
     </SidebarProvider>
   );

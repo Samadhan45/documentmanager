@@ -7,9 +7,20 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import {ScrollArea} from './ui/scroll-area';
 import {Button} from './ui/button';
-import {Download, Copy, Check} from 'lucide-react';
+import {Download, Copy, Check, Trash2} from 'lucide-react';
 import type {Document} from '@/lib/types';
 import {Badge} from './ui/badge';
 import React, {useState} from 'react';
@@ -19,6 +30,7 @@ interface DocumentViewSheetProps {
   document: Document | null;
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
+  onDelete: (documentId: string) => void;
 }
 
 interface MetadataItemProps {
@@ -54,7 +66,11 @@ function KeyInfoItem({label, value}: {label: string; value: string}) {
         <p className="text-sm text-muted-foreground">{value}</p>
       </div>
       <Button variant="ghost" size="icon" onClick={handleCopy}>
-        {hasCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+        {hasCopied ? (
+          <Check className="h-4 w-4 text-green-500" />
+        ) : (
+          <Copy className="h-4 w-4" />
+        )}
       </Button>
     </div>
   );
@@ -64,6 +80,7 @@ export default function DocumentViewSheet({
   document,
   isOpen,
   onOpenChange,
+  onDelete,
 }: DocumentViewSheetProps) {
   if (!document) return null;
 
@@ -103,7 +120,11 @@ export default function DocumentViewSheet({
                 <h3 className="mb-2 text-lg font-semibold">Key Information</h3>
                 <div className="space-y-2">
                   {document.keyInfo.map((info, index) => (
-                    <KeyInfoItem key={index} label={info.label} value={info.value} />
+                    <KeyInfoItem
+                      key={index}
+                      label={info.label}
+                      value={info.value}
+                    />
                   ))}
                 </div>
               </div>
@@ -140,13 +161,36 @@ export default function DocumentViewSheet({
             </div>
           </div>
         </ScrollArea>
-        <div className="border-t p-4">
+        <div className="flex gap-2 border-t p-4">
           <Button className="w-full" asChild>
             <a href={document.fileUrl} download={document.fileName}>
               <Download className="mr-2 h-4 w-4" />
-              Download Original
+              Download
             </a>
           </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="icon">
+                <Trash2 className="h-4 w-4" />
+                <span className="sr-only">Delete</span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  document.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => onDelete(document.id)}>
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </SheetContent>
     </Sheet>
