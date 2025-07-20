@@ -39,7 +39,9 @@ import {
   type DocumentSearchInput,
 } from '@/ai/flows/document-search';
 import DocumentViewSheet from './document-view-sheet';
-import {useAuth, UserButton} from '@clerk/nextjs';
+import {UserButton} from '@/components/auth/user-button';
+import {useAuthContext} from '@/lib/firebase/auth-context';
+import {useRouter} from 'next/navigation';
 
 type SearchResult = {
   documentId: string;
@@ -47,7 +49,8 @@ type SearchResult = {
 };
 
 export default function AppShell() {
-  const {userId} = useAuth();
+  const {user} = useAuthContext();
+  const router = useRouter();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -62,13 +65,20 @@ export default function AppShell() {
   const {toast} = useToast();
 
   const getStorageKey = useCallback(() => {
-    return `certvault-ai-documents-${userId}`;
-  }, [userId]);
+    if (!user) return null;
+    return `certvault-ai-documents-${user.uid}`;
+  }, [user]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+    const storageKey = getStorageKey();
+    if (!storageKey) return;
+
     try {
-      const storedDocs = localStorage.getItem(getStorageKey());
+      const storedDocs = localStorage.getItem(storageKey);
       if (storedDocs) {
         setDocuments(JSON.parse(storedDocs));
       }
@@ -81,17 +91,18 @@ export default function AppShell() {
       });
     }
     setIsLoading(false);
-  }, [userId, toast, getStorageKey]);
+  }, [user, toast, getStorageKey, router]);
 
   useEffect(() => {
-    if (!isLoading && userId) {
+    const storageKey = getStorageKey();
+    if (!isLoading && storageKey) {
       try {
-        localStorage.setItem(getStorageKey(), JSON.stringify(documents));
+        localStorage.setItem(storageKey, JSON.stringify(documents));
       } catch (error) {
         console.error('Failed to save documents to localStorage', error);
       }
     }
-  }, [documents, isLoading, userId, getStorageKey]);
+  }, [documents, isLoading, getStorageKey]);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -233,12 +244,8 @@ export default function AppShell() {
     );
   }, [documents, activeCategory, searchQuery, searchResults]);
 
-  if (!userId) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin" />
-      </div>
-    );
+  if (!user) {
+    return null; // or a loading spinner, since we redirect in useEffect
   }
 
   return (
