@@ -5,6 +5,7 @@ import {
   SheetContent,
   SheetHeader,
   SheetTitle,
+  SheetDescription,
 } from '@/components/ui/sheet';
 import {ScrollArea} from './ui/scroll-area';
 import {Button} from './ui/button';
@@ -40,15 +41,6 @@ export default function DocumentViewSheet({
 }: DocumentViewSheetProps) {
   if (!document) return null;
 
-  const handleDownload = () => {
-    const link = document.createElement('a');
-    link.href = document.fileUrl;
-    link.download = document.fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-full flex-col sm:max-w-lg">
@@ -56,9 +48,9 @@ export default function DocumentViewSheet({
           <SheetTitle className="line-clamp-2 pr-8">
             {document.fileName}
           </SheetTitle>
-          <div className="text-sm text-muted-foreground">
+          <SheetDescription>
             <Badge variant="secondary">{document.category}</Badge>
-          </div>
+          </SheetDescription>
         </SheetHeader>
         <ScrollArea className="flex-1">
           <div className="space-y-6 p-1 pr-6">
@@ -110,9 +102,11 @@ export default function DocumentViewSheet({
           </div>
         </ScrollArea>
         <div className="border-t p-4">
-          <Button className="w-full" onClick={handleDownload}>
-            <Download className="mr-2 h-4 w-4" />
-            Download Original
+          <Button className="w-full" asChild>
+            <a href={document.fileUrl} download={document.fileName}>
+              <Download className="mr-2 h-4 w-4" />
+              Download Original
+            </a>
           </Button>
         </div>
       </SheetContent>
