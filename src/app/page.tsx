@@ -89,7 +89,7 @@ export default function Home() {
             width={600}
             height={400}
             className="rounded-xl object-cover shadow-2xl"
-            data-ai-hint="digital vault abstract"
+            data-ai-hint="artificial intelligence abstract"
           />
         </motion.div>
       </motion.div>
