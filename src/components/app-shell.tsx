@@ -11,7 +11,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import {Home, Loader2, Plus, Search} from 'lucide-react';
+import {Home, Loader2, Plus, Search, LogOut} from 'lucide-react';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button} from './ui/button';
 import {Input} from './ui/input';
@@ -39,6 +39,7 @@ import {
   type DocumentSearchInput,
 } from '@/ai/flows/document-search';
 import DocumentViewSheet from './document-view-sheet';
+import Link from 'next/link';
 
 type SearchResult = {
   documentId: string;
@@ -315,6 +316,12 @@ export default function AppShell() {
                 </Button>
               </UploadDialog>
               <ThemeToggleButton />
+              <Button variant="outline" size="icon" asChild>
+                <Link href="/sign-in">
+                  <LogOut />
+                  <span className="sr-only">Log out</span>
+                </Link>
+              </Button>
             </div>
           </header>
 
