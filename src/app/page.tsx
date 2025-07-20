@@ -1,7 +1,17 @@
 import {Button} from '@/components/ui/button';
 import Link from 'next/link';
+import {auth} from '@clerk/nextjs/server';
+import {redirect} from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 
 export default function Home() {
+  const {userId} = auth();
+
+  if (userId) {
+    redirect('/dashboard');
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8">
       <div className="text-center">
@@ -13,10 +23,10 @@ export default function Home() {
         </p>
         <div className="mt-10 flex items-center justify-center gap-x-6">
           <Button asChild>
-            <Link href="/dashboard">Get Started</Link>
+            <Link href="/sign-up">Get Started</Link>
           </Button>
           <Button variant="ghost" asChild>
-            <Link href="https://github.com">Learn more &rarr;</Link>
+            <Link href="/sign-in">Sign In</Link>
           </Button>
         </div>
       </div>
