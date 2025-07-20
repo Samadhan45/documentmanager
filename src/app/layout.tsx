@@ -2,7 +2,6 @@ import type {Metadata} from 'next';
 import './globals.css';
 import {ThemeProvider} from '@/components/theme-provider';
 import {Toaster} from '@/components/ui/toaster';
-import {AuthProvider} from '@/lib/firebase/auth-context';
 
 export const metadata: Metadata = {
   title: 'CertVault AI',
@@ -36,10 +35,8 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <AuthProvider>
-            {children}
-            <Toaster />
-          </AuthProvider>
+          {children}
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

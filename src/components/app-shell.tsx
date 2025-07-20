@@ -39,16 +39,15 @@ import {
   type DocumentSearchInput,
 } from '@/ai/flows/document-search';
 import DocumentViewSheet from './document-view-sheet';
-import {UserButton} from '@/components/auth/user-button';
-import {useAuthContext} from '@/lib/firebase/auth-context';
 
 type SearchResult = {
   documentId: string;
   relevanceScore: number;
 };
 
+const STORAGE_KEY = 'certvault-ai-documents';
+
 export default function AppShell() {
-  const {user} = useAuthContext();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -62,17 +61,9 @@ export default function AppShell() {
 
   const {toast} = useToast();
 
-  const getStorageKey = useCallback(() => {
-    if (!user) return null;
-    return `certvault-ai-documents-${user.uid}`;
-  }, [user]);
-
   useEffect(() => {
-    const storageKey = getStorageKey();
-    if (!storageKey) return;
-
     try {
-      const storedDocs = localStorage.getItem(storageKey);
+      const storedDocs = localStorage.getItem(STORAGE_KEY);
       if (storedDocs) {
         setDocuments(JSON.parse(storedDocs));
       }
@@ -85,18 +76,17 @@ export default function AppShell() {
       });
     }
     setIsLoading(false);
-  }, [user, toast, getStorageKey]);
+  }, [toast]);
 
   useEffect(() => {
-    const storageKey = getStorageKey();
-    if (!isLoading && storageKey) {
+    if (!isLoading) {
       try {
-        localStorage.setItem(storageKey, JSON.stringify(documents));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
       } catch (error) {
         console.error('Failed to save documents to localStorage', error);
       }
     }
-  }, [documents, isLoading, getStorageKey]);
+  }, [documents, isLoading]);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -325,7 +315,6 @@ export default function AppShell() {
                 </Button>
               </UploadDialog>
               <ThemeToggleButton />
-              <UserButton />
             </div>
           </header>
 
