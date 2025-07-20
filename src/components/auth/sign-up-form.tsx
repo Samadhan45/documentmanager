@@ -55,7 +55,7 @@ export default function SignUpForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
+      await createUserWithEmailAndPassword(getAuth(firebaseApp), email, password);
       router.push('/dashboard');
     } catch (error: any) {
       toast({
@@ -71,7 +71,7 @@ export default function SignUpForm() {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(getAuth(firebaseApp), googleProvider);
       router.push('/dashboard');
     } catch (error: any) {
       toast({

@@ -41,7 +41,6 @@ import {
 import DocumentViewSheet from './document-view-sheet';
 import {UserButton} from '@/components/auth/user-button';
 import {useAuthContext} from '@/lib/firebase/auth-context';
-import {useRouter} from 'next/navigation';
 
 type SearchResult = {
   documentId: string;
@@ -50,7 +49,6 @@ type SearchResult = {
 
 export default function AppShell() {
   const {user} = useAuthContext();
-  const router = useRouter();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -70,10 +68,6 @@ export default function AppShell() {
   }, [user]);
 
   useEffect(() => {
-    if (!user) {
-      router.push('/sign-in');
-      return;
-    }
     const storageKey = getStorageKey();
     if (!storageKey) return;
 
@@ -91,7 +85,7 @@ export default function AppShell() {
       });
     }
     setIsLoading(false);
-  }, [user, toast, getStorageKey, router]);
+  }, [user, toast, getStorageKey]);
 
   useEffect(() => {
     const storageKey = getStorageKey();
@@ -113,6 +107,10 @@ export default function AppShell() {
 
     setIsSearching(true);
     const handler = setTimeout(async () => {
+      if (documents.length === 0) {
+        setIsSearching(false);
+        return;
+      }
       try {
         const input: DocumentSearchInput = {
           query: searchQuery,
@@ -234,19 +232,19 @@ export default function AppShell() {
       });
       // Filter out documents that are not in the search results
       docs = docs.filter(doc => rankedDocs.has(doc.id));
-    } else if (searchQuery) {
-      // If there's a search query but no results (e.g., during search), show empty
+    } else if (searchQuery && documents.length > 0) {
+      // If there's a search query but no results yet (e.g., during search), show nothing.
+      return [];
+    } else if (searchQuery && documents.length === 0) {
+      // If there's a search query and no documents at all, show no results.
       return [];
     }
+
 
     return docs.filter(
       doc => activeCategory === 'All' || doc.category === activeCategory
     );
   }, [documents, activeCategory, searchQuery, searchResults]);
-
-  if (!user) {
-    return null; // or a loading spinner, since we redirect in useEffect
-  }
 
   return (
     <SidebarProvider>

@@ -55,7 +55,7 @@ export default function SignInForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(getAuth(firebaseApp), email, password);
       router.push('/dashboard');
     } catch (error: any) {
       toast({
@@ -71,7 +71,7 @@ export default function SignInForm() {
   const handleGoogleSignIn = async () => {
     setIsGoogleLoading(true);
     try {
-      await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(getAuth(firebaseApp), googleProvider);
       router.push('/dashboard');
     } catch (error: any) {
       toast({
