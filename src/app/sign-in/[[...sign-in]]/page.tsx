@@ -1,6 +1,11 @@
 import Link from 'next/link';
 import Script from 'next/script';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Icons } from '@/components/icons';
 
 export default function SignInPage() {
   return (
@@ -14,23 +19,47 @@ export default function SignInPage() {
               Sign in to access your CertVault AI dashboard.
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex flex-col items-center gap-4">
-            <div
-              id="g_id_onload"
-              data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-              data-login_uri="/dashboard"
-              data-auto_prompt="false"
-            ></div>
-            <div
-              className="g_id_signin"
-              data-type="standard"
-              data-size="large"
-              data-theme="outline"
-              data-text="sign_in_with"
-              data-shape="rectangular"
-              data-logo_alignment="left"
-            ></div>
-            <Link href="/dashboard" className="text-sm text-primary hover:underline mt-4">
+          <CardContent className="flex flex-col gap-4">
+            <form className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" type="email" placeholder="m@example.com" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" type="password" required />
+              </div>
+              <Button type="submit" className="w-full">
+                Sign In with Email
+              </Button>
+            </form>
+
+            <div className="relative">
+              <Separator />
+              <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
+                <span className="bg-background px-2 text-sm text-muted-foreground">OR</span>
+              </div>
+            </div>
+            
+            <div className="flex flex-col items-center gap-4">
+               <div
+                id="g_id_onload"
+                data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+                data-login_uri="/dashboard"
+                data-auto_prompt="false"
+              ></div>
+              <div
+                className="g_id_signin"
+                data-type="standard"
+                data-size="large"
+                data-theme="outline"
+                data-text="sign_in_with"
+                data-shape="rectangular"
+                data-logo_alignment="left"
+              ></div>
+            </div>
+
+            <Link href="/dashboard" className="text-center text-sm text-primary hover:underline mt-2">
               Proceed to Dashboard (after sign-in)
             </Link>
           </CardContent>
