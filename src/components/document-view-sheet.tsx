@@ -3,7 +3,6 @@
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
@@ -57,9 +56,9 @@ export default function DocumentViewSheet({
           <SheetTitle className="line-clamp-2 pr-8">
             {document.fileName}
           </SheetTitle>
-          <SheetDescription>
+          <div className="text-sm text-muted-foreground">
             <Badge variant="secondary">{document.category}</Badge>
-          </SheetDescription>
+          </div>
         </SheetHeader>
         <ScrollArea className="flex-1">
           <div className="space-y-6 p-1 pr-6">
