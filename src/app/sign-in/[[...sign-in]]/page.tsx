@@ -43,7 +43,7 @@ export default function SignInPage() {
             <div className="flex flex-col items-center gap-4">
                <div
                 id="g_id_onload"
-                data-client_id="484646535805-78r49t9ks1963gpnpqis5c1utdm3d8da.apps.googleusercontent.com"
+                data-client_id="857692423877-bfps7cvj31d11p17s1qamo4ubr3sursa.apps.googleusercontent.com"
                 data-login_uri="/dashboard"
                 data-auto_prompt="false"
               ></div>
