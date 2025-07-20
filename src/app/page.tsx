@@ -1,5 +1,33 @@
-import AppShell from '@/components/app-shell';
+import {Button} from '@/components/ui/button';
+import {auth} from '@clerk/nextjs/server';
+import Link from 'next/link';
+import {redirect} from 'next/navigation';
 
 export default function Home() {
-  return <AppShell />;
+  const {userId} = auth();
+
+  if (userId) {
+    redirect('/dashboard');
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8">
+      <div className="text-center">
+        <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-6xl">
+          Welcome to CertVault AI
+        </h1>
+        <p className="mt-6 text-lg leading-8 text-muted-foreground">
+          Smartly manage your certificates and documents with the power of AI.
+        </p>
+        <div className="mt-10 flex items-center justify-center gap-x-6">
+          <Button asChild>
+            <Link href="/sign-in">Get Started</Link>
+          </Button>
+          <Button variant="ghost" asChild>
+            <Link href="https://github.com">Learn more &rarr;</Link>
+          </Button>
+        </div>
+      </div>
+    </main>
+  );
 }
