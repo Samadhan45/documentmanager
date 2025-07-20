@@ -44,7 +44,7 @@ export default function SignInPage() {
                <div
                 id="g_id_onload"
                 data-client_id="857692423877-bfps7cvj31d11p17s1qamo4ubr3sursa.apps.googleusercontent.com"
-                data-login_uri="/dashboard"
+                data-login_uri="http://localhost:9002/dashboard"
                 data-auto_prompt="false"
               ></div>
               <div
