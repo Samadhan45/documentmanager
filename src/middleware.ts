@@ -1,4 +1,7 @@
 import {clerkMiddleware, createRouteMatcher} from '@clerk/nextjs/server';
+import {config as dotenvConfig} from 'dotenv';
+
+dotenvConfig();
 
 const isPublicRoute = createRouteMatcher(['/sign-in(.*)', '/sign-up(.*)']);
 
