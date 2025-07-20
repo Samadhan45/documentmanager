@@ -41,6 +41,31 @@ export function UserButton() {
     return null;
   }
 
+  const getAvatarFallback = () => {
+    if (user.isAnonymous) {
+      return <User />;
+    }
+    if (user.email) {
+      return user.email.charAt(0).toUpperCase();
+    }
+    return <User />;
+  }
+
+  const getDisplayName = () => {
+    if (user.isAnonymous) {
+      return 'Guest User';
+    }
+    return user.displayName || 'User';
+  }
+
+  const getDisplayIdentifier = () => {
+    if (user.isAnonymous) {
+      return `ID: ${user.uid.substring(0, 6)}...`;
+    }
+    return user.email;
+  }
+
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -48,7 +73,7 @@ export function UserButton() {
           <Avatar className="h-8 w-8">
             <AvatarImage src={user.photoURL || ''} alt={user.displayName || ''} />
             <AvatarFallback>
-              {user.email ? user.email.charAt(0).toUpperCase() : <User />}
+              {getAvatarFallback()}
             </AvatarFallback>
           </Avatar>
         </Button>
@@ -57,10 +82,10 @@ export function UserButton() {
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
-              {user.displayName || 'User'}
+              {getDisplayName()}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {user.email}
+              {getDisplayIdentifier()}
             </p>
           </div>
         </DropdownMenuLabel>
