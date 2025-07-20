@@ -38,6 +38,10 @@ import {
   summarizeAndExtractMetadata,
   type SummarizeAndExtractMetadataInput,
 } from '@/ai/flows/summarize-and-extract-metadata';
+import {
+  extractKeyInfo,
+  type ExtractKeyInfoInput,
+} from '@/ai/flows/extract-key-info';
 import DocumentViewSheet from './document-view-sheet';
 
 const STORAGE_KEY = 'certvault-ai-documents';
@@ -102,6 +106,11 @@ export default function AppShell() {
           };
           const {category} = await autoCategorizeDocuments(categorizationInput);
 
+          const keyInfoInput: ExtractKeyInfoInput = {
+            documentText: metadata.summary,
+          };
+          const {keyInfo} = await extractKeyInfo(keyInfoInput);
+
           const newDocument: Document = {
             id: crypto.randomUUID(),
             fileName: file.name,
@@ -110,6 +119,7 @@ export default function AppShell() {
             category:
               CATEGORIES.find(c => c === category) || ('Other' as const),
             metadata,
+            keyInfo,
             createdAt: new Date().toISOString(),
           };
 

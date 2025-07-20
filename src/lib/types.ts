@@ -20,6 +20,11 @@ export interface DocumentMetadata {
   issuingAuthority: string;
 }
 
+export interface KeyInfo {
+  label: string;
+  value: string;
+}
+
 export interface Document {
   id: string;
   fileName: string;
@@ -27,5 +32,6 @@ export interface Document {
   fileType: string;
   category: DocumentCategory;
   metadata: DocumentMetadata;
+  keyInfo: KeyInfo[];
   createdAt: string;
 }

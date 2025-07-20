@@ -9,9 +9,11 @@ import {
 } from '@/components/ui/sheet';
 import {ScrollArea} from './ui/scroll-area';
 import {Button} from './ui/button';
-import {Download} from 'lucide-react';
+import {Download, Copy, Check} from 'lucide-react';
 import type {Document} from '@/lib/types';
 import {Badge} from './ui/badge';
+import React, {useState} from 'react';
+import {useToast} from '@/hooks/use-toast';
 
 interface DocumentViewSheetProps {
   document: Document | null;
@@ -34,6 +36,30 @@ function MetadataItem({label, value}: MetadataItemProps) {
   );
 }
 
+function KeyInfoItem({label, value}: {label: string; value: string}) {
+  const [hasCopied, setHasCopied] = useState(false);
+  const {toast} = useToast();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(value);
+    setHasCopied(true);
+    toast({title: 'Copied!', description: `${label} copied to clipboard.`});
+    setTimeout(() => setHasCopied(false), 2000);
+  };
+
+  return (
+    <div className="flex items-center justify-between rounded-md border bg-muted/50 p-3">
+      <div>
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-sm text-muted-foreground">{value}</p>
+      </div>
+      <Button variant="ghost" size="icon" onClick={handleCopy}>
+        {hasCopied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+      </Button>
+    </div>
+  );
+}
+
 export default function DocumentViewSheet({
   document,
   isOpen,
@@ -48,8 +74,10 @@ export default function DocumentViewSheet({
           <SheetTitle className="line-clamp-2 pr-8">
             {document.fileName}
           </SheetTitle>
-          <SheetDescription>
-            <Badge variant="secondary">{document.category}</Badge>
+          <SheetDescription asChild>
+            <div>
+              <Badge variant="secondary">{document.category}</Badge>
+            </div>
           </SheetDescription>
         </SheetHeader>
         <ScrollArea className="flex-1">
@@ -69,6 +97,17 @@ export default function DocumentViewSheet({
                 />
               )}
             </div>
+
+            {document.keyInfo && document.keyInfo.length > 0 && (
+              <div>
+                <h3 className="mb-2 text-lg font-semibold">Key Information</h3>
+                <div className="space-y-2">
+                  {document.keyInfo.map((info, index) => (
+                    <KeyInfoItem key={index} label={info.label} value={info.value} />
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div>
               <h3 className="mb-2 text-lg font-semibold">Summary</h3>
