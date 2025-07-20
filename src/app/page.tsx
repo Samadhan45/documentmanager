@@ -4,6 +4,7 @@ import {Button} from '@/components/ui/button';
 import Link from 'next/link';
 import {motion} from 'framer-motion';
 import Image from 'next/image';
+import {Icons} from '@/components/icons';
 
 export default function Home() {
   const containerVariants = {
@@ -50,6 +51,9 @@ export default function Home() {
         animate="visible"
       >
         <div className="flex flex-col items-center text-center md:items-start md:text-left">
+          <motion.div variants={itemVariants}>
+            <Icons.logo className="mb-4 h-16 w-16 text-primary" />
+          </motion.div>
           <motion.h1
             className="text-4xl font-bold tracking-tighter text-foreground sm:text-5xl md:text-6xl"
             variants={itemVariants}
@@ -70,7 +74,7 @@ export default function Home() {
             <Button asChild size="lg">
               <Link href="/dashboard">Get Started</Link>
             </Button>
-            <Button variant="ghost" asChild size="lg">
+            <Button variant="outline" asChild size="lg">
               <Link href="/sign-in">Sign In</Link>
             </Button>
           </motion.div>
@@ -85,7 +89,7 @@ export default function Home() {
             width={600}
             height={400}
             className="rounded-xl object-cover shadow-2xl"
-            data-ai-hint="documents security"
+            data-ai-hint="digital vault abstract"
           />
         </motion.div>
       </motion.div>
