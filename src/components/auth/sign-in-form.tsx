@@ -22,7 +22,6 @@ import {Label} from '@/components/ui/label';
 import {useToast} from '@/hooks/use-toast';
 import {Loader2} from 'lucide-react';
 import Link from 'next/link';
-import {Icons} from '@/components/icons';
 
 const auth = getAuth(firebaseApp);
 const googleProvider = new GoogleAuthProvider();
