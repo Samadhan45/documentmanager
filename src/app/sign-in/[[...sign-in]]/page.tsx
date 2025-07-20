@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Icons } from '@/components/icons';
 
 export default function SignInPage() {
   return (
@@ -17,7 +16,7 @@ export default function SignInPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
-          <form className="space-y-4">
+          <form action="/dashboard" className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" placeholder="m@example.com" required />
@@ -37,22 +36,14 @@ export default function SignInPage() {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                Or continue with
+                Or
               </span>
             </div>
           </div>
           
-          <div className="flex flex-col items-center gap-4">
-            <Button variant="outline" className="w-full" asChild>
-              <Link href="/dashboard">
-                <Icons.google className="mr-2 h-4 w-4" />
-                Sign in with Google
-              </Link>
-            </Button>
-            <Button variant="secondary" className="w-full" asChild>
-              <Link href="/dashboard">Continue as Guest</Link>
-            </Button>
-          </div>
+          <Button variant="secondary" className="w-full" asChild>
+            <Link href="/dashboard">Continue as Guest</Link>
+          </Button>
         </CardContent>
       </Card>
     </div>
