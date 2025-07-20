@@ -16,32 +16,31 @@ export default function DocumentCard({document, onSelect}: DocumentCardProps) {
   return (
     <motion.div
       layout
-      initial={{opacity: 0, scale: 0.8}}
+      initial={{opacity: 0, scale: 0.9}}
       animate={{opacity: 1, scale: 1}}
-      exit={{opacity: 0, scale: 0.8}}
-      transition={{type: 'spring', stiffness: 300, damping: 30}}
+      exit={{opacity: 0, scale: 0.9}}
+      transition={{type: 'spring', stiffness: 300, damping: 25}}
       className="h-full"
     >
       <Card
-        className="flex h-full cursor-pointer flex-col transition-all hover:shadow-lg hover:-translate-y-1"
+        className="flex h-full cursor-pointer flex-col overflow-hidden border-border/80 bg-card transition-all duration-300 ease-in-out hover:border-primary/50 hover:shadow-lg hover:shadow-primary/10"
         onClick={() => onSelect(document)}
       >
-        <CardHeader className="flex-row items-center justify-between space-y-0 pb-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary">
-            <Icon className="h-6 w-6" />
+        <CardHeader className="flex-row items-center justify-between space-y-0 p-4 pb-2">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <Icon className="h-5 w-5" />
           </div>
-          <p className="text-xs text-muted-foreground">
-            {format(parseISO(document.createdAt), 'MMM d, yyyy')}
-          </p>
         </CardHeader>
-        <CardContent className="flex flex-1 flex-col justify-end">
+        <CardContent className="flex flex-1 flex-col justify-end p-4 pt-0">
           <p
-            className="line-clamp-2 text-sm font-medium"
+            className="line-clamp-2 text-sm font-semibold leading-tight text-card-foreground"
             title={document.fileName}
           >
             {document.fileName}
           </p>
-          <p className="text-xs text-muted-foreground">{document.category}</p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            {format(parseISO(document.createdAt), 'MMM d, yyyy')}
+          </p>
         </CardContent>
       </Card>
     </motion.div>
