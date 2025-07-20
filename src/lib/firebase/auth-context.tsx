@@ -4,12 +4,17 @@ import {createContext, useContext, useEffect, useState} from 'react';
 import type {User} from 'firebase/auth';
 import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import {firebaseApp} from '@/lib/firebase/config';
-import {Loader2} from 'lucide-react';
 
 const auth = getAuth(firebaseApp);
 
-export const AuthContext = createContext<{user: User | null}>({
+type AuthContextType = {
+  user: User | null;
+  loading: boolean;
+};
+
+export const AuthContext = createContext<AuthContextType>({
   user: null,
+  loading: true,
 });
 
 export const useAuthContext = () => useContext(AuthContext);
@@ -27,15 +32,9 @@ export function AuthProvider({children}: {children: React.ReactNode}) {
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Loader2 className="h-10 w-10 animate-spin" />
-      </div>
-    );
-  }
-
   return (
-    <AuthContext.Provider value={{user}}>{children}</AuthContext.Provider>
+    <AuthContext.Provider value={{user, loading}}>
+      {children}
+    </AuthContext.Provider>
   );
 }
