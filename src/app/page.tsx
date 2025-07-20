@@ -84,12 +84,11 @@ export default function Home() {
           variants={imageVariants}
         >
           <Image
-            src="https://placehold.co/600x400.png"
-            alt="Digital vault illustration"
+            src="https://storage.googleapis.com/fsm-media-fe-prod/1/9/19e95977-99e6-42f2-8c9a-41f238b77626.webp"
+            alt="An AI platform displaying digital certificates and documents, illustrating intelligent document management."
             width={600}
             height={400}
             className="rounded-xl object-cover shadow-2xl"
-            data-ai-hint="artificial intelligence abstract"
           />
         </motion.div>
       </motion.div>
