@@ -39,8 +39,7 @@ import {
   type DocumentSearchInput,
 } from '@/ai/flows/document-search';
 import DocumentViewSheet from './document-view-sheet';
-
-const STORAGE_KEY = 'certvault-ai-documents';
+import {useAuth, UserButton} from '@clerk/nextjs';
 
 type SearchResult = {
   documentId: string;
@@ -48,6 +47,7 @@ type SearchResult = {
 };
 
 export default function AppShell() {
+  const {userId} = useAuth();
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
@@ -61,9 +61,14 @@ export default function AppShell() {
 
   const {toast} = useToast();
 
+  const getStorageKey = useCallback(() => {
+    return `certvault-ai-documents-${userId}`;
+  }, [userId]);
+
   useEffect(() => {
+    if (!userId) return;
     try {
-      const storedDocs = localStorage.getItem(STORAGE_KEY);
+      const storedDocs = localStorage.getItem(getStorageKey());
       if (storedDocs) {
         setDocuments(JSON.parse(storedDocs));
       }
@@ -76,17 +81,17 @@ export default function AppShell() {
       });
     }
     setIsLoading(false);
-  }, [toast]);
+  }, [userId, toast, getStorageKey]);
 
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && userId) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
+        localStorage.setItem(getStorageKey(), JSON.stringify(documents));
       } catch (error) {
         console.error('Failed to save documents to localStorage', error);
       }
     }
-  }, [documents, isLoading]);
+  }, [documents, isLoading, userId, getStorageKey]);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -111,7 +116,8 @@ export default function AppShell() {
         console.error('AI search failed:', error);
         toast({
           title: 'Search Failed',
-          description: 'The AI search could not be completed. Please try again.',
+          description:
+            'The AI search could not be completed. Please try again.',
           variant: 'destructive',
         });
         setSearchResults([]);
@@ -188,14 +194,17 @@ export default function AppShell() {
     [toast]
   );
 
-  const handleDeleteDocument = useCallback((documentId: string) => {
-    setDocuments(prev => prev.filter(doc => doc.id !== documentId));
-    setActiveDocument(null);
-    toast({
-      title: 'Document Deleted',
-      description: 'The document has been successfully deleted.',
-    });
-  }, [toast]);
+  const handleDeleteDocument = useCallback(
+    (documentId: string) => {
+      setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+      setActiveDocument(null);
+      toast({
+        title: 'Document Deleted',
+        description: 'The document has been successfully deleted.',
+      });
+    },
+    [toast]
+  );
 
   const filteredDocuments = useMemo(() => {
     let docs = documents;
@@ -216,13 +225,21 @@ export default function AppShell() {
       docs = docs.filter(doc => rankedDocs.has(doc.id));
     } else if (searchQuery) {
       // If there's a search query but no results (e.g., during search), show empty
-       return [];
+      return [];
     }
 
     return docs.filter(
       doc => activeCategory === 'All' || doc.category === activeCategory
     );
   }, [documents, activeCategory, searchQuery, searchResults]);
+
+  if (!userId) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-10 w-10 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -279,7 +296,9 @@ export default function AppShell() {
               <SidebarTrigger className="md:hidden" />
               <div className="relative hidden w-full max-w-sm items-center md:flex">
                 <Search className="absolute left-3 text-muted-foreground" />
-                {isSearching && <Loader2 className="absolute right-3 animate-spin" />}
+                {isSearching && (
+                  <Loader2 className="absolute right-3 animate-spin" />
+                )}
                 <Input
                   placeholder="Ask about your documents..."
                   className="pl-10"
@@ -301,6 +320,7 @@ export default function AppShell() {
                 </Button>
               </UploadDialog>
               <ThemeToggleButton />
+              <UserButton />
             </div>
           </header>
 
@@ -309,7 +329,9 @@ export default function AppShell() {
               <h1 className="text-2xl font-bold">{activeCategory}</h1>
               <div className="relative flex w-full max-w-sm items-center md:hidden">
                 <Search className="absolute left-3 text-muted-foreground" />
-                 {isSearching && <Loader2 className="absolute right-3 animate-spin" />}
+                {isSearching && (
+                  <Loader2 className="absolute right-3 animate-spin" />
+                )}
                 <Input
                   placeholder="Ask about your documents..."
                   className="pl-10"
