@@ -26,7 +26,6 @@ import {useToast} from '@/hooks/use-toast';
 import {Loader2} from 'lucide-react';
 import Link from 'next/link';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import {Icons} from '@/components/icons';
 
 const auth = getAuth(firebaseApp);
 
@@ -72,7 +71,8 @@ export default function SignInForm() {
   const [password, setPassword] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
-  const [verificationId, setVerificationId] = useState<ConfirmationResult | null>(null);
+  const [verificationId, setVerificationId] =
+    useState<ConfirmationResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isPhoneLoading, setIsPhoneLoading] = useState(false);
   const [isCodeSent, setIsCodeSent] = useState(false);
@@ -83,12 +83,16 @@ export default function SignInForm() {
     // This effect ensures the reCAPTCHA is rendered on the client side.
     setTimeout(() => {
       if (!window.recaptchaVerifier) {
-        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-          size: 'invisible',
-          callback: (response: any) => {
-            // reCAPTCHA solved, allow signInWithPhoneNumber.
-          },
-        });
+        window.recaptchaVerifier = new RecaptchaVerifier(
+          auth,
+          'recaptcha-container',
+          {
+            size: 'invisible',
+            callback: (response: any) => {
+              // reCAPTCHA solved, allow signInWithPhoneNumber.
+            },
+          }
+        );
       }
     }, 100);
   }, []);
@@ -149,9 +153,9 @@ export default function SignInForm() {
         description: error.message,
         variant: 'destructive',
       });
-       // Reset reCAPTCHA
+      // Reset reCAPTCHA
       if (window.recaptchaVerifier) {
-        window.recaptchaVerifier.render().then((widgetId) => {
+        window.recaptchaVerifier.render().then(widgetId => {
           // @ts-ignore
           window.grecaptcha.reset(widgetId);
         });
@@ -178,7 +182,6 @@ export default function SignInForm() {
       setIsPhoneLoading(false);
     }
   };
-
 
   return (
     <Card className="w-full max-w-sm">
@@ -240,14 +243,20 @@ export default function SignInForm() {
                     disabled={isPhoneLoading}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isPhoneLoading}>
-                  {isPhoneLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isPhoneLoading}
+                >
+                  {isPhoneLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Send Code
                 </Button>
               </form>
             ) : (
               <form onSubmit={handleVerifyCode} className="grid gap-4 pt-4">
-                 <div className="grid gap-2">
+                <div className="grid gap-2">
                   <Label htmlFor="code">Verification Code</Label>
                   <Input
                     id="code"
@@ -259,8 +268,14 @@ export default function SignInForm() {
                     disabled={isPhoneLoading}
                   />
                 </div>
-                <Button type="submit" className="w-full" disabled={isPhoneLoading}>
-                  {isPhoneLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isPhoneLoading}
+                >
+                  {isPhoneLoading && (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Verify & Sign In
                 </Button>
               </form>
@@ -297,7 +312,7 @@ export default function SignInForm() {
           </Link>
         </div>
       </CardContent>
-       <div id="recaptcha-container"></div>
+      <div id="recaptcha-container"></div>
     </Card>
   );
 }
