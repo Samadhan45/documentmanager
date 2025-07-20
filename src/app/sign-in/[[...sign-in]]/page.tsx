@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { Icons } from '@/components/icons';
 
 export default function SignInPage() {
   return (
@@ -37,7 +36,7 @@ export default function SignInPage() {
             <div className="relative">
               <Separator />
               <div className="absolute inset-x-0 top-1/2 -translate-y-1/2">
-                <span className="bg-background px-2 text-sm text-muted-foreground">OR</span>
+                <span className="bg-card px-2 text-center text-sm text-muted-foreground flex justify-center">OR</span>
               </div>
             </div>
             
@@ -57,11 +56,10 @@ export default function SignInPage() {
                 data-shape="rectangular"
                 data-logo_alignment="left"
               ></div>
+              <Button variant="secondary" className="w-full" asChild>
+                <Link href="/dashboard">Continue as Guest</Link>
+              </Button>
             </div>
-
-            <Link href="/dashboard" className="text-center text-sm text-primary hover:underline mt-2">
-              Proceed to Dashboard (after sign-in)
-            </Link>
           </CardContent>
         </Card>
       </div>
