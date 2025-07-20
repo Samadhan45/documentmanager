@@ -3,7 +3,6 @@
 import {Button} from '@/components/ui/button';
 import Link from 'next/link';
 import {motion} from 'framer-motion';
-import Image from 'next/image';
 import {Icons} from '@/components/icons';
 
 export default function Home() {
@@ -29,67 +28,40 @@ export default function Home() {
     },
   };
 
-  const imageVariants = {
-    hidden: {x: 100, opacity: 0},
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: 'spring',
-        stiffness: 80,
-        delay: 0.4,
-      },
-    },
-  };
-
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-8">
+    <main className="flex min-h-screen flex-col items-center justify-center bg-background p-8 text-center">
       <motion.div
-        className="grid max-w-6xl grid-cols-1 items-center gap-12 md:grid-cols-2"
+        className="flex flex-col items-center"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
-        <div className="flex flex-col items-center text-center md:items-start md:text-left">
-          <motion.div variants={itemVariants}>
-            <Icons.logo className="mb-4 h-16 w-16 text-primary" />
-          </motion.div>
-          <motion.h1
-            className="text-4xl font-bold tracking-tighter text-foreground sm:text-5xl md:text-6xl"
-            variants={itemVariants}
-          >
-            Welcome to <span className="text-primary">CertVault AI</span>
-          </motion.h1>
-          <motion.p
-            className="mt-4 max-w-md text-lg text-muted-foreground"
-            variants={itemVariants}
-          >
-            Smartly manage your certificates and documents with the power of AI.
-            Secure, intelligent, and always accessible.
-          </motion.p>
-          <motion.div
-            className="mt-8 flex flex-col gap-4 sm:flex-row"
-            variants={itemVariants}
-          >
-            <Button asChild size="lg">
-              <Link href="/dashboard">Get Started</Link>
-            </Button>
-            <Button variant="outline" asChild size="lg">
-              <Link href="/sign-in">Sign In</Link>
-            </Button>
-          </motion.div>
-        </div>
-        <motion.div
-          className="relative hidden h-full w-full md:block"
-          variants={imageVariants}
+        <motion.div variants={itemVariants}>
+          <Icons.logo className="mb-4 h-24 w-24 text-primary" />
+        </motion.div>
+        <motion.h1
+          className="text-4xl font-bold tracking-tighter text-foreground sm:text-5xl md:text-6xl"
+          variants={itemVariants}
         >
-          <Image
-            src="https://storage.googleapis.com/fsm-media-fe-prod/1/9/19e95977-99e6-42f2-8c9a-41f238b77626.webp"
-            alt="An AI platform displaying digital certificates and documents, illustrating intelligent document management."
-            width={600}
-            height={400}
-            className="rounded-xl object-cover shadow-2xl"
-          />
+          Welcome to <span className="text-primary">CertVault AI</span>
+        </motion.h1>
+        <motion.p
+          className="mt-4 max-w-xl text-lg text-muted-foreground"
+          variants={itemVariants}
+        >
+          Smartly manage your certificates and documents with the power of AI.
+          Secure, intelligent, and always accessible on your device.
+        </motion.p>
+        <motion.div
+          className="mt-8 flex flex-col gap-4 sm:flex-row"
+          variants={itemVariants}
+        >
+          <Button asChild size="lg">
+            <Link href="/sign-in">Sign In</Link>
+          </Button>
+          <Button variant="outline" asChild size="lg">
+            <Link href="/sign-up">Sign Up</Link>
+          </Button>
         </motion.div>
       </motion.div>
     </main>
