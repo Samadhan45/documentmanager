@@ -25,6 +25,7 @@ import type {Document} from '@/lib/types';
 import {Badge} from './ui/badge';
 import React, {useState} from 'react';
 import {useToast} from '@/hooks/use-toast';
+import Image from 'next/image';
 
 interface DocumentViewSheetProps {
   document: Document | null;
@@ -83,6 +84,8 @@ export default function DocumentViewSheet({
   onDelete,
 }: DocumentViewSheetProps) {
   if (!document) return null;
+  
+  const isSample = document.id === 'sample-doc-1';
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -94,6 +97,7 @@ export default function DocumentViewSheet({
           <SheetDescription asChild>
             <div>
               <Badge variant="secondary">{document.category}</Badge>
+              {isSample && <Badge className="ml-2">Sample</Badge>}
             </div>
           </SheetDescription>
         </SheetHeader>
@@ -101,10 +105,11 @@ export default function DocumentViewSheet({
           <div className="space-y-6 p-1 pr-6">
             <div className="relative aspect-[8.5/11] w-full overflow-hidden rounded-lg border">
               {document.fileType.startsWith('image/') ? (
-                <img
+                <Image
                   src={document.fileUrl}
                   alt={document.fileName}
-                  className="h-full w-full object-contain"
+                  layout="fill"
+                  objectFit="contain"
                 />
               ) : (
                 <iframe
@@ -170,7 +175,7 @@ export default function DocumentViewSheet({
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="icon">
+              <Button variant="destructive" size="icon" disabled={isSample}>
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Delete</span>
               </Button>

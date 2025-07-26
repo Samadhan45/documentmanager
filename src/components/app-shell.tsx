@@ -48,6 +48,28 @@ type SearchResult = {
 
 const STORAGE_KEY = 'certvault-ai-documents';
 
+const sampleDocument: Document = {
+  id: 'sample-doc-1',
+  fileName: 'Sample University Diploma.png',
+  fileUrl: 'https://placehold.co/850x1100.png',
+  fileType: 'image/png',
+  category: 'Education',
+  metadata: {
+    summary:
+      'This is a sample university diploma for Alex Doe from the University of Innovation, awarded on May 15, 2023. It represents a Bachelor of Science in Artificial Intelligence.',
+    documentType: 'Diploma',
+    name: 'Alex Doe',
+    dateOfIssue: '2023-05-15',
+    issuingAuthority: 'University of Innovation',
+  },
+  keyInfo: [
+    {label: 'Student ID', value: 'UOI-12345'},
+    {label: 'Degree', value: 'Bachelor of Science'},
+    {label: 'Major', value: 'Artificial Intelligence'},
+  ],
+  createdAt: new Date('2023-05-15T10:00:00Z').toISOString(),
+};
+
 export default function AppShell() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -63,15 +85,18 @@ export default function AppShell() {
   const {toast} = useToast();
 
   useEffect(() => {
-    // Simulate a short delay to allow the UI to render the loading state first.
     const timer = setTimeout(() => {
       try {
         const storedDocs = localStorage.getItem(STORAGE_KEY);
-        if (storedDocs) {
+        if (storedDocs && JSON.parse(storedDocs).length > 0) {
           setDocuments(JSON.parse(storedDocs));
+        } else {
+          // If no documents are in storage, load the sample one.
+          setDocuments([sampleDocument]);
         }
       } catch (error) {
         console.error('Failed to parse documents from localStorage', error);
+        setDocuments([sampleDocument]); // Load sample on error as well
         toast({
           title: 'Error',
           description: 'Could not load your saved documents.',
@@ -79,7 +104,7 @@ export default function AppShell() {
         });
       }
       setIsLoading(false);
-    }, 500); // A small delay to improve perceived performance
+    }, 500);
 
     return () => clearTimeout(timer);
   }, [toast]);
@@ -87,7 +112,12 @@ export default function AppShell() {
   useEffect(() => {
     if (!isLoading) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
+        // We only save to local storage if it's not the initial sample document
+        const isSample =
+          documents.length === 1 && documents[0].id === 'sample-doc-1';
+        if (!isSample) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
+        }
       } catch (error) {
         console.error('Failed to save documents to localStorage', error);
       }
@@ -101,8 +131,8 @@ export default function AppShell() {
       return;
     }
 
-    setIsSearching(true);
-    const handler = setTimeout(async () => {
+    const performSearch = async () => {
+      setIsSearching(true);
       if (documents.length === 0) {
         setIsSearching(false);
         return;
@@ -129,7 +159,9 @@ export default function AppShell() {
       } finally {
         setIsSearching(false);
       }
-    }, 500); // Debounce search
+    };
+
+    const handler = setTimeout(performSearch, 500); // Debounce search
 
     return () => {
       clearTimeout(handler);
@@ -173,8 +205,14 @@ export default function AppShell() {
             keyInfo,
             createdAt: new Date().toISOString(),
           };
-
-          setDocuments(prev => [newDocument, ...prev]);
+          
+          // If the only document is the sample one, replace it. Otherwise, add to the list.
+          setDocuments(prev => {
+            const isSample =
+              prev.length === 1 && prev[0].id === 'sample-doc-1';
+            return isSample ? [newDocument] : [newDocument, ...prev];
+          });
+          
           toast({
             title: 'Upload Successful',
             description: `${file.name} has been processed and saved.`,
