@@ -59,9 +59,17 @@ export default function Home() {
           <Button asChild size="lg">
             <Link href="/sign-in">Sign In</Link>
           </Button>
-          <Button variant="outline" asChild size="lg">
-            <Link href="/sign-up">Sign Up</Link>
+          <Button asChild size="lg" variant="secondary">
+            <Link href="/dashboard">Continue as Guest</Link>
           </Button>
+        </motion.div>
+        <motion.div className="mt-4" variants={itemVariants}>
+          <p className="text-sm text-muted-foreground">
+            New here?{' '}
+            <Link href="/sign-up" className="text-primary hover:underline">
+              Create an account
+            </Link>
+          </p>
         </motion.div>
       </motion.div>
     </main>
