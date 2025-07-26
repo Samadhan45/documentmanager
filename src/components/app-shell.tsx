@@ -63,20 +63,25 @@ export default function AppShell() {
   const {toast} = useToast();
 
   useEffect(() => {
-    try {
-      const storedDocs = localStorage.getItem(STORAGE_KEY);
-      if (storedDocs) {
-        setDocuments(JSON.parse(storedDocs));
+    // Simulate a short delay to allow the UI to render the loading state first.
+    const timer = setTimeout(() => {
+      try {
+        const storedDocs = localStorage.getItem(STORAGE_KEY);
+        if (storedDocs) {
+          setDocuments(JSON.parse(storedDocs));
+        }
+      } catch (error) {
+        console.error('Failed to parse documents from localStorage', error);
+        toast({
+          title: 'Error',
+          description: 'Could not load your saved documents.',
+          variant: 'destructive',
+        });
       }
-    } catch (error) {
-      console.error('Failed to parse documents from localStorage', error);
-      toast({
-        title: 'Error',
-        description: 'Could not load your saved documents.',
-        variant: 'destructive',
-      });
-    }
-    setIsLoading(false);
+      setIsLoading(false);
+    }, 500); // A small delay to improve perceived performance
+
+    return () => clearTimeout(timer);
   }, [toast]);
 
   useEffect(() => {
@@ -207,6 +212,11 @@ export default function AppShell() {
   );
 
   const filteredDocuments = useMemo(() => {
+    // If we're still doing the initial load, return an empty array
+    if (isLoading) {
+      return [];
+    }
+
     let docs = documents;
 
     if (searchQuery && searchResults.length > 0) {
@@ -223,19 +233,18 @@ export default function AppShell() {
       });
       // Filter out documents that are not in the search results
       docs = docs.filter(doc => rankedDocs.has(doc.id));
-    } else if (searchQuery && documents.length > 0) {
-      // If there's a search query but no results yet (e.g., during search), show nothing.
+    } else if (searchQuery && documents.length > 0 && !isSearching) {
+      // If there's a search query but no results (and we're not actively searching), it means no matches.
       return [];
-    } else if (searchQuery && documents.length === 0) {
-      // If there's a search query and no documents at all, show no results.
+    } else if (searchQuery && isSearching) {
+      // While actively searching, don't show any documents until results come back.
       return [];
     }
-
 
     return docs.filter(
       doc => activeCategory === 'All' || doc.category === activeCategory
     );
-  }, [documents, activeCategory, searchQuery, searchResults]);
+  }, [documents, activeCategory, searchQuery, searchResults, isLoading, isSearching]);
 
   return (
     <SidebarProvider>

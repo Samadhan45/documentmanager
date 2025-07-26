@@ -31,7 +31,7 @@ export default function DocumentCard({document, onSelect}: DocumentCardProps) {
             <Icon className="h-5 w-5" />
           </div>
         </CardHeader>
-        <CardContent className="flex flex-1 flex-col justify-end p-4 pt-0">
+        <CardContent className="flex flex-1 flex-col justify-between p-4 pt-0">
           <p
             className="line-clamp-2 text-sm font-semibold leading-tight text-card-foreground"
             title={document.fileName}
