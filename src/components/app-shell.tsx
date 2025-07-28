@@ -4,6 +4,7 @@
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -59,6 +60,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from './ui/alert-dialog';
+import {AboutDialog} from './about-dialog';
 
 type SearchResult = {
   documentId: string;
@@ -383,6 +385,9 @@ export default function AppShell() {
               })}
             </SidebarMenu>
           </SidebarContent>
+          <SidebarFooter>
+            <AboutDialog />
+          </SidebarFooter>
         </Sidebar>
         <SidebarInset>
           <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
