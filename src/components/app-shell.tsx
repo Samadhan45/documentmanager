@@ -364,7 +364,7 @@ export default function AppShell() {
               </UploadDialog>
               <ThemeToggleButton />
               <Button variant="outline" size="icon" asChild>
-                <Link href="/sign-in">
+                <Link href="/">
                   <LogOut />
                   <span className="sr-only">Log out</span>
                 </Link>
