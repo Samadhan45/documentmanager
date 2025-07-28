@@ -1,4 +1,3 @@
-```markdown
 # 📄 CertVault AI – Smart Document Management App
 
 **CertVault AI** is a modern and intelligent document management web application built with **Next.js**, **Firebase**, and AI capabilities. It allows users to securely upload, organize, and retrieve documents with lightning speed — all through a sleek, responsive, and user-friendly interface.
@@ -7,7 +6,7 @@
 
 ## 🔗 Live Demo
 
-👉 **[Explore CertVault AI](https://studio-lovat-pi.vercel.app/)**
+[👉 Explore CertVault AI](https://studio-lovat-pi.vercel.app/)
 
 ---
 
