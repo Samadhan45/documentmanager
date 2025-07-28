@@ -11,7 +11,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import {Home, Loader2, Plus, Search, LogOut} from 'lucide-react';
+import {
+  Home,
+  Loader2,
+  Plus,
+  Search,
+  LogOut,
+  RotateCcw,
+} from 'lucide-react';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button} from './ui/button';
 import {Input} from './ui/input';
@@ -40,6 +47,17 @@ import {
 } from '@/ai/flows/document-search';
 import DocumentViewSheet from './document-view-sheet';
 import Link from 'next/link';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './ui/alert-dialog';
 
 type SearchResult = {
   documentId: string;
@@ -51,7 +69,8 @@ const STORAGE_KEY = 'certvault-ai-documents';
 const sampleDocument: Document = {
   id: 'sample-doc-1',
   fileName: 'Sample University Diploma.png',
-  fileUrl: 'https://storage.googleapis.com/fsm-media-fe-prod/1/9/19e95977-99e6-42f2-8c9a-41f238b77626.webp',
+  fileUrl:
+    'https://storage.googleapis.com/fsm-media-fe-prod/1/9/19e95977-99e6-42f2-8c9a-41f238b77626.webp',
   fileType: 'image/png',
   category: 'Education',
   metadata: {
@@ -205,14 +224,14 @@ export default function AppShell() {
             keyInfo,
             createdAt: new Date().toISOString(),
           };
-          
+
           // If the only document is the sample one, replace it. Otherwise, add to the list.
           setDocuments(prev => {
             const isSample =
               prev.length === 1 && prev[0].id === 'sample-doc-1';
             return isSample ? [newDocument] : [newDocument, ...prev];
           });
-          
+
           toast({
             title: 'Upload Successful',
             description: `${file.name} has been processed and saved.`,
@@ -249,6 +268,15 @@ export default function AppShell() {
     [toast]
   );
 
+  const handleResetData = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setDocuments([sampleDocument]);
+    toast({
+      title: 'Data Cleared',
+      description: 'All local documents have been removed.',
+    });
+  };
+
   const filteredDocuments = useMemo(() => {
     // If we're still doing the initial load, return an empty array
     if (isLoading) {
@@ -282,7 +310,14 @@ export default function AppShell() {
     return docs.filter(
       doc => activeCategory === 'All' || doc.category === activeCategory
     );
-  }, [documents, activeCategory, searchQuery, searchResults, isLoading, isSearching]);
+  }, [
+    documents,
+    activeCategory,
+    searchQuery,
+    searchResults,
+    isLoading,
+    isSearching,
+  ]);
 
   return (
     <SidebarProvider>
@@ -363,6 +398,31 @@ export default function AppShell() {
                 </Button>
               </UploadDialog>
               <ThemeToggleButton />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <RotateCcw />
+                    <span className="sr-only">Reset Data</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      all your uploaded documents from this browser and restore
+                      the sample document.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetData}>
+                      Reset
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
               <Button variant="outline" size="icon" asChild>
                 <Link href="/">
                   <LogOut />
