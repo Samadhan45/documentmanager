@@ -41,9 +41,18 @@ interface MetadataItemProps {
 
 function MetadataItem({label, value}: MetadataItemProps) {
   if (!value) return null;
+
+  // Function to convert camelCase to Title Case
+  const toTitleCase = (str: string) => {
+    const result = str.replace(/([A-Z])/g, ' $1');
+    return result.charAt(0).toUpperCase() + result.slice(1);
+  };
+
   return (
     <div>
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium text-muted-foreground">
+        {toTitleCase(label)}
+      </p>
       <p className="text-base">{value}</p>
     </div>
   );
@@ -86,6 +95,10 @@ export default function DocumentViewSheet({
   if (!document) return null;
 
   const isSample = document.id === 'sample-resume-1';
+
+  const metadataEntries = Object.entries(document.metadata).filter(
+    ([key]) => key !== 'summary'
+  );
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -155,28 +168,16 @@ export default function DocumentViewSheet({
               </p>
             </div>
 
-            <div>
-              <h3 className="mb-4 text-lg font-semibold">Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <MetadataItem
-                  label="Document Type"
-                  value={document.metadata.documentType}
-                />
-                <MetadataItem label="Name" value={document.metadata.name} />
-                <MetadataItem
-                  label="Date of Issue"
-                  value={document.metadata.dateOfIssue}
-                />
-                <MetadataItem
-                  label="Expiry Date"
-                  value={document.metadata.expiryDate}
-                />
-                <MetadataItem
-                  label="Issuing Authority"
-                  value={document.metadata.issuingAuthority}
-                />
+            {metadataEntries.length > 0 && (
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">Details</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {metadataEntries.map(([key, value]) => (
+                    <MetadataItem key={key} label={key} value={value} />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </ScrollArea>
         <div className="flex gap-2 border-t p-4">
