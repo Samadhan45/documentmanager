@@ -21,7 +21,7 @@ import {
   LogOut,
   RotateCcw,
 } from 'lucide-react';
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button} from './ui/button';
 import {Input} from './ui/input';
 import {ThemeToggleButton} from './theme-toggle-button';
@@ -74,7 +74,7 @@ const blobUrlMap = new Map<string, string>();
 const sampleDocument: Document = {
   id: 'sample-resume-1',
   fileName: 'John_Doe_Resume.png',
-  fileUrl: 'https://placehold.co/850x1100.png',
+  fileUrl: 'https://drive.google.com/uc?export=view&id=14UBw_h71P4dNSJdVUS3CbwY4ixcFyjZb',
   fileType: 'image/png',
   category: 'Employment',
   metadata: {
