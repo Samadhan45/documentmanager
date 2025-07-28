@@ -32,7 +32,7 @@ export function AboutDialog() {
       <DialogTrigger asChild>
         <Button
           variant="ghost"
-          className="w-full justify-start text-muted-foreground hover:text-foreground"
+          className="w-full justify-start text-primary-foreground/90 bg-primary/20 hover:bg-primary/30 hover:text-primary-foreground ring-2 ring-primary/50 animate-pulse-slow shadow-lg shadow-primary/30"
         >
           <Info className="mr-2" />
           <span>About this App</span>
