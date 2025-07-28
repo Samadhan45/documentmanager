@@ -1,42 +1,46 @@
-Firebase Studio is a powerful and modern document organizing web application built using **Next.js** and **Firebase**. It helps users efficiently manage, upload, and organize their documents with a sleek and responsive interface.
+
+````markdown
+# 📄 CertVault AI – Smart Document Management App
+
+**CertVault AI** is a modern and intelligent document management web application built with **Next.js**, **Firebase**, and AI capabilities. It allows users to securely upload, organize, and retrieve documents with lightning speed — all through a sleek, responsive, and user-friendly interface.
 
 ---
 
-## 🌐 Live Project
+## 🔗 Live Demo
 
-**[🚀 Click Here to Explore Firebase Studio](https://studio-lovat-pi.vercel.app/)**
+👉 [Explore CertVault AI](https://studio-lovat-pi.vercel.app/)
 
 ---
 
-## 📁 Features
+## 🚀 Key Features
 
-- 📂 Upload, organize, and manage documents in one place  
-- 🔍 AI-powered smart search for quick document retrieval  
-- 📝 Add notes, links (e.g., Google Drive), and summaries to documents  
-- 🧠 AI Summary Generator to extract key insights  
-- 🌙 Light and Dark Mode toggle  
-- 📤 Download documents as JPEG or PDF  
-- 🔐 Firebase Authentication for secure access  
-- ⚡ Real-time updates and storage with Firebase  
-- 📱 Fully responsive design for mobile, tablet, and desktop
+- 📂 **Upload & Manage Documents** – Centralized space for all your documents  
+- 🔐 **Firebase Authentication** – Secure access and user-based data isolation  
+- 🔍 **AI-Powered Search** – Smart keyword-based search using AI  
+- 🧠 **AI Summary Generator** – Extract key insights from your uploaded documents  
+- 📝 **Add Notes, External Links & Tags** – Enhance document metadata  
+- 📤 **Export as JPEG/PDF** – Download documents in multiple formats  
+- 🌙 **Light / Dark Mode** – Switch between themes for comfort  
+- 🔄 **Real-Time Sync** – Powered by Firebase Firestore and Storage  
+- 📱 **Mobile-Friendly** – Fully responsive across all device sizes  
 
 ---
 
 ## 🛠 Tech Stack
 
-| Frontend        | Backend/Database     | Other Features       |
-|-----------------|----------------------|----------------------|
-| Next.js 14      | Firebase Firestore   | Tailwind CSS         |
-| TypeScript      | Firebase Auth        | AI Search & Summary  |
-| React Hooks     | Firebase Storage     | PDF/JPEG Export      |
+| Frontend            | Backend / Database     | AI & Utilities             |
+|---------------------|------------------------|----------------------------|
+| Next.js 14          | Firebase Firestore     | AI Summary (Gemini/GPT)    |
+| TypeScript          | Firebase Auth          | Document Export (PDF/JPEG) |
+| React Hooks         | Firebase Storage       | Tailwind CSS               |
 
 ---
 
-## 🧑‍💻 Getting Started
+## ⚙️ Getting Started
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/your-username/firebase-studio.git
+   git clone https://github.com/Samadhan45/firebase-studio.git
    cd firebase-studio
 ````
 
@@ -46,12 +50,22 @@ Firebase Studio is a powerful and modern document organizing web application bui
    npm install
    ```
 
-3. **Configure Firebase**
+3. **Set Up Firebase**
 
-   * Create a `.env.local` file and add your Firebase credentials.
-   * Set up Firebase Firestore, Auth, and Storage.
+   * Create a Firebase project
+   * Enable Firestore, Auth, and Storage
+   * Add your credentials to `.env.local`:
 
-4. **Run the App**
+     ```env
+     NEXT_PUBLIC_FIREBASE_API_KEY=your-api-key
+     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your-auth-domain
+     NEXT_PUBLIC_FIREBASE_PROJECT_ID=your-project-id
+     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
+     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
+     NEXT_PUBLIC_FIREBASE_APP_ID=your-app-id
+     ```
+
+4. **Run the Development Server**
 
    ```bash
    npm run dev
@@ -59,48 +73,42 @@ Firebase Studio is a powerful and modern document organizing web application bui
 
 ---
 
-## 📸 Screenshots
+## 🛤️ Roadmap
 
-*Add real screenshots here once available:*
-
-```markdown
-![Screenshot 1](https://placehold.co/600x400?text=Dashboard+Preview)
-![Screenshot 2](https://placehold.co/600x400?text=Upload+Documents)
-```
-
----
-
-## 📌 Roadmap / Upcoming Features
-
-* 🧾 Optical Character Recognition (OCR) for scanned files
-* 🔗 Document sharing with user permissions
-* 🗂️ Smart folder suggestions using AI
-* 📅 Reminder and notification system
+* 🧾 OCR support for scanned files
+* 🔗 Shareable documents with access control
+* 🗂️ AI-powered smart folder organization
+* 🔔 Notifications and reminders for expiring documents
+* 📊 Usage analytics dashboard for users
 
 ---
 
-## 🤝 Contributing
+## 🤝 Contributions
 
-Contributions, issues, and feature requests are welcome!
-Feel free to open a pull request or fork the repo.
+Have ideas or improvements? Feel free to:
+
+* Fork this repo
+* Create a new branch
+* Commit your changes
+* Open a pull request
 
 ---
 
 ## 📬 Contact
 
-For feedback or collaboration:
-
-* 📧 [samadhankadam002@gmail.com](mailto:samadhankadam002@gmail.com)
-* 🌐 [Portfolio](https://samadhan45.github.io/portfolio/)
-* 💼 [LinkedIn](https://linkedin.com/in/samadhan1)
+**Samadhan Kadam**
+📧 [samadhankadam002@gmail.com](mailto:samadhankadam002@gmail.com)
+🌐 [Portfolio](https://samadhan-zeta.vercel.app/)
+💼 [LinkedIn](https://linkedin.com/in/samadhan1)
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+This project is licensed under the [MIT License](LICENSE)
 
 ---
 
-**Built with ❤️ by [Samadhan Kadam](https://github.com/Samadhan45)**
+> Built with ❤️ by [Samadhan Kadam](https://github.com/Samadhan45)
 
+```
