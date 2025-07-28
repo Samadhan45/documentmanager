@@ -104,29 +104,23 @@ export default function AppShell() {
   const {toast} = useToast();
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      try {
-        const storedDocs = localStorage.getItem(STORAGE_KEY);
-        if (storedDocs && JSON.parse(storedDocs).length > 0) {
-          setDocuments(JSON.parse(storedDocs));
-        } else {
-          // If no documents are in storage, load the sample one.
-          setDocuments([sampleDocument]);
-        }
-      } catch (error) {
-        console.error('Failed to parse documents from localStorage', error);
-        setDocuments([sampleDocument]); // Load sample on error as well
-        toast({
-          title: 'Error',
-          description: 'Could not load your saved documents.',
-          variant: 'destructive',
-        });
+    // This effect now only runs once on mount to set initial state
+    setIsLoading(true);
+    try {
+      const storedDocs = localStorage.getItem(STORAGE_KEY);
+      if (storedDocs && JSON.parse(storedDocs).length > 0) {
+        setDocuments(JSON.parse(storedDocs));
+      } else {
+        // If no documents are in storage, load the sample one.
+        setDocuments([sampleDocument]);
       }
+    } catch (error) {
+      console.error('Failed to parse documents from localStorage', error);
+      setDocuments([sampleDocument]); // Load sample on error as well
+    } finally {
       setIsLoading(false);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [toast]);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isLoading) {
@@ -136,6 +130,9 @@ export default function AppShell() {
           documents.length === 1 && documents[0].id === 'sample-doc-1';
         if (!isSample) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
+        } else {
+          // If we are down to just the sample document, make sure storage is clear
+          localStorage.removeItem(STORAGE_KEY);
         }
       } catch (error) {
         console.error('Failed to save documents to localStorage', error);
@@ -151,11 +148,10 @@ export default function AppShell() {
     }
 
     const performSearch = async () => {
-      setIsSearching(true);
       if (documents.length === 0) {
-        setIsSearching(false);
         return;
       }
+      setIsSearching(true);
       try {
         const input: DocumentSearchInput = {
           query: searchQuery,
@@ -278,11 +274,6 @@ export default function AppShell() {
   };
 
   const filteredDocuments = useMemo(() => {
-    // If we're still doing the initial load, return an empty array
-    if (isLoading) {
-      return [];
-    }
-
     let docs = documents;
 
     if (searchQuery && searchResults.length > 0) {
@@ -297,13 +288,10 @@ export default function AppShell() {
         if (rankB === undefined) return -1;
         return rankA - rankB;
       });
-      // Filter out documents that are not in the search results
       docs = docs.filter(doc => rankedDocs.has(doc.id));
     } else if (searchQuery && documents.length > 0 && !isSearching) {
-      // If there's a search query but no results (and we're not actively searching), it means no matches.
       return [];
     } else if (searchQuery && isSearching) {
-      // While actively searching, don't show any documents until results come back.
       return [];
     }
 
@@ -315,7 +303,6 @@ export default function AppShell() {
     activeCategory,
     searchQuery,
     searchResults,
-    isLoading,
     isSearching,
   ]);
 
