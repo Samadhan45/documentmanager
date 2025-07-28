@@ -69,12 +69,12 @@ const STORAGE_KEY = 'certvault-ai-documents';
 const sampleDocument: Document = {
   id: 'sample-resume-1',
   fileName: 'Samadhan_Kadam_Resume.png',
-  fileUrl: 'https://placehold.co/850x1100.png',
+  fileUrl: 'https://storage.googleapis.com/static.aiprompt.io/Samadhan_Kadam_Resume.png',
   fileType: 'image/png',
   category: 'Employment',
   metadata: {
     summary:
-      'Java Developer with experience in building scalable full-stack apps using React.js and Next.js. Strong in debugging, problem-solving, and quick to learn new technologies.',
+      'Highly skilled and motivated Java Developer with a strong foundation in building scalable and efficient full-stack applications. Proficient in a wide range of technologies including Java, C++, Python, React.js, and Next.js. Experienced in developing and maintaining robust backend systems using Django and Node.js, coupled with expertise in database management with Oracle SQL, PostgreSQL, and MongoDB. A quick learner with excellent debugging and problem-solving abilities, committed to writing clean, maintainable code and staying updated with the latest industry trends.',
     documentType: 'Resume',
     name: 'Samadhan Vilas Kadam',
     location: 'Pune, India',
