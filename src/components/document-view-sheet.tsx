@@ -100,27 +100,30 @@ export default function DocumentViewSheet({
     ([key]) => key !== 'summary'
   );
 
-  const handleOpenPdf = () => {
-    if (!document || !document.fileUrl.startsWith('data:application/pdf'))
-      return;
+  const handleOpenPreview = () => {
+    if (!document) return;
 
-    // Convert data URI to blob
-    const byteString = atob(document.fileUrl.split(',')[1]);
-    const mimeString = document.fileUrl
-      .split(',')[0]
-      .split(':')[1]
-      .split(';')[0];
-    const ab = new ArrayBuffer(byteString.length);
-    const ia = new Uint8Array(ab);
-    for (let i = 0; i < byteString.length; i++) {
-      ia[i] = byteString.charCodeAt(i);
+    if (document.fileUrl.startsWith('data:')) {
+      // Convert data URI to blob
+      const byteString = atob(document.fileUrl.split(',')[1]);
+      const mimeString = document.fileUrl
+        .split(',')[0]
+        .split(':')[1]
+        .split(';')[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], {type: mimeString});
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } else {
+      // For direct URLs
+      window.open(document.fileUrl, '_blank');
     }
-    const blob = new Blob([ab], {type: mimeString});
-    const blobUrl = URL.createObjectURL(blob);
-
-    // Open blob URL in a new tab
-    window.open(blobUrl, '_blank');
   };
+
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -139,28 +142,18 @@ export default function DocumentViewSheet({
         <ScrollArea className="flex-1">
           <div className="space-y-6 p-1 pr-6">
             <div
-              className="aspect-[8.5/11] w-full overflow-hidden rounded-lg border flex items-center justify-center"
+              className="aspect-[8.5/11] w-full overflow-hidden rounded-lg border flex items-center justify-center bg-muted/50 p-4 text-center"
               data-ai-hint="resume professional"
             >
-              {document.fileType.startsWith('image/') ? (
-                <Image
-                  src={document.fileUrl}
-                  alt={document.fileName}
-                  width={850}
-                  height={1100}
-                  className="h-auto w-full object-contain"
-                />
-              ) : (
-                <div className="flex h-full w-full flex-col items-center justify-center bg-muted/50 p-4 text-center">
+               <div className="flex h-full w-full flex-col items-center justify-center">
                   <p className="mb-4 text-sm font-medium text-muted-foreground">
-                    PDF previews open in a new tab.
+                    Previews open in a new tab.
                   </p>
-                  <Button onClick={handleOpenPdf}>
+                  <Button onClick={handleOpenPreview}>
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Open Preview
                   </Button>
                 </div>
-              )}
             </div>
 
             {document.keyInfo && document.keyInfo.length > 0 && (
