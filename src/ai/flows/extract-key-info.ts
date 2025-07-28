@@ -51,16 +51,17 @@ const prompt = ai.definePrompt({
   output: {schema: ExtractKeyInfoOutputSchema},
   prompt: `You are an AI assistant that extracts key information from documents.
 
-  Analyze the document text provided and identify important contact information, identifiers, and critical data points. For each piece of information, create a clear, concise label and extract the corresponding value.
+  Analyze the document text provided and identify important contact information, identifiers, skills, and critical data points. For each piece of information, create a clear, concise label and extract the corresponding value.
 
   Examples of information to extract:
   - Email Address
   - Phone Number
   - Website or Portfolio URL
   - LinkedIn Profile
-  - Account Number
-  - Member ID
-  - Policy Number
+  - GitHub Profile
+  - Primary Skills
+  - Backend Technologies
+  - Databases
 
   Document Text:
   {{{documentText}}}

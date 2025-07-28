@@ -68,27 +68,29 @@ const STORAGE_KEY = 'certvault-ai-documents';
 
 const sampleDocument: Document = {
   id: 'sample-resume-1',
-  fileName: 'John_Doe_Resume.png',
+  fileName: 'Samadhan_Kadam_Resume.png',
   fileUrl: 'https://placehold.co/850x1100.png',
   fileType: 'image/png',
   category: 'Employment',
   metadata: {
     summary:
-      'A comprehensive resume for John Doe, a Full Stack Software Engineer with over 5 years of experience specializing in building and scaling dynamic web applications. Proficient in front-end technologies like React and TypeScript, back-end development with Node.js and Python, and deploying on cloud platforms such as Google Cloud and AWS. A proven track record of delivering high-quality code, optimizing application performance, and collaborating effectively in agile environments. Seeking to leverage expertise in a challenging role to build innovative software solutions.',
+      'Java Developer with experience in building scalable full-stack apps using React.js and Next.js. Strong in debugging, problem-solving, and quick to learn new technologies.',
     documentType: 'Resume',
-    name: 'John Doe',
-    location: 'San Francisco, CA',
+    name: 'Samadhan Vilas Kadam',
+    location: 'Pune, India',
     issuingAuthority: 'Self-published',
   },
   keyInfo: [
-    {label: 'Email', value: 'john.doe@email.com'},
-    {label: 'Phone', value: '(123) 456-7890'},
-    {label: 'Website', value: 'johndoe.dev'},
-    {label: 'LinkedIn', value: 'linkedin.com/in/johndoe'},
-    {label: 'Primary Skills', value: 'React, Node.js, TypeScript, GCP'},
-    {label: 'Secondary Skills', value: 'Python, SQL, Docker, Kubernetes'},
+    {label: 'Email', value: 'samadhankadam002@gmail.com'},
+    {label: 'Phone', value: '8010792529'},
+    {label: 'GitHub', value: 'github.com/Samadhan45'},
+    {label: 'LinkedIn', value: 'linkedin.com/in/samadhan1'},
+    {label: 'Portfolio', value: 'samadhan-zeta.vercel.app'},
+    {label: 'Primary Skills', value: 'Java, C++, Python, React.js, Next.js'},
+    {label: 'Backend Technologies', value: 'Django, Node.js'},
+    {label: 'Databases', value: 'Oracle SQL, PostgreSQL, MongoDB'},
   ],
-  createdAt: new Date('2024-07-01T10:00:00Z').toISOString(),
+  createdAt: new Date().toISOString(),
 };
 
 export default function AppShell() {

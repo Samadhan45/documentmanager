@@ -39,13 +39,13 @@ const summarizeAndExtractMetadataPrompt = ai.definePrompt({
   prompt: `You are an AI assistant that summarizes documents and extracts key metadata.
 
   Analyze the document provided and extract the following information:
-  - A short summary of the document content.
+  - A short, professional summary of the document content. For a resume, this should be the professional summary section.
   - The type of the document (e.g., Resume, ID, Medical).
-  - The name of the person or entity associated with the document.
-  - The location (e.g., "San Francisco, CA") if present.
-  - The organization or authority that issued the document (e.g., the company name on a resume).
+  - The full name of the person or entity associated with the document.
+  - The location (e.g., "San Francisco, CA" or "Pune, India") if present.
+  - The organization or authority that issued the document (e.g., the company name on a resume, or "Self-published" for a personal resume).
 
-  Do not extract dates like "date of issue" or "expiry date" unless they are part of the core document content.
+  Do not extract dates like "date of issue" or "expiry date".
 
   Document: {{media url=documentDataUri}}
   `,
