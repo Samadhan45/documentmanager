@@ -73,26 +73,33 @@ const blobUrlMap = new Map<string, string>();
 
 const sampleDocument: Document = {
   id: 'sample-resume-1',
-  fileName: 'John_Doe_Resume.png',
+  fileName: 'Samadhan_Kadam_Resume.png',
   fileUrl: 'https://drive.google.com/uc?export=view&id=14UBw_h71P4dNSJdVUS3CbwY4ixcFyjZb',
   fileType: 'image/png',
   category: 'Employment',
   metadata: {
     summary:
-      'A highly skilled and motivated professional with experience in software development and project management. Proven ability to lead teams and deliver high-quality products on time and within budget. Seeking to leverage technical expertise and leadership skills in a challenging new role.',
+      'A highly skilled and motivated Java Full Stack Developer with experience in building and deploying scalable web applications. Proven ability to work with modern technologies to deliver high-quality software solutions. Seeking to leverage technical expertise in a challenging new role.',
     documentType: 'Resume',
-    name: 'John Doe',
-    location: 'San Francisco, CA',
+    name: 'Samadhan Vilas Kadam',
+    location: 'Pune, India',
     issuingAuthority: 'Self-published',
   },
   keyInfo: [
-    {label: 'Email', value: 'john.doe@example.com'},
-    {label: 'Phone', value: '123-456-7890'},
-    {label: 'Website', value: 'johndoe.dev'},
-    {label: 'LinkedIn', value: 'linkedin.com/in/johndoe'},
+    {label: 'Website', value: 'samadhan-zeta.vercel.app'},
+    {label: 'LinkedIn', value: 'linkedin.com/in/samadhan1'},
+    {label: 'GitHub', value: 'github.com/Samadhan45'},
     {
       label: 'Primary Skills',
-      value: 'React, Node.js, TypeScript, Project Management',
+      value: 'Java, Spring Boot, React, Next.js, TypeScript',
+    },
+    {
+      label: 'Backend Technologies',
+      value: 'Java, Spring, Hibernate, REST APIs',
+    },
+     {
+      label: 'Databases',
+      value: 'MySQL, MongoDB',
     },
   ],
   createdAt: new Date().toISOString(),
