@@ -96,6 +96,7 @@ export default function DocumentViewSheet({
   if (!document) return null;
 
   const isSample = document.id === 'sample-resume-1';
+  const isImage = document.fileType.startsWith('image/');
 
   const metadataEntries = Object.entries(document.metadata).filter(
     ([key]) => key !== 'summary'
@@ -143,18 +144,28 @@ export default function DocumentViewSheet({
         <ScrollArea className="flex-1">
           <div className="space-y-6 p-1 pr-6">
             <div
-              className="aspect-[8.5/11] w-full overflow-hidden rounded-lg border flex items-center justify-center bg-muted/50 p-4 text-center"
+              className="aspect-[8.5/11] w-full overflow-hidden rounded-lg border flex items-center justify-center bg-muted/50 p-1"
               data-ai-hint="resume professional"
             >
-               <div className="flex h-full w-full flex-col items-center justify-center">
+              {isImage ? (
+                <Image
+                  src={document.fileUrl}
+                  alt={document.fileName}
+                  width={850}
+                  height={1100}
+                  className="h-full w-full object-contain"
+                />
+              ) : (
+                 <div className="flex h-full w-full flex-col items-center justify-center text-center">
                   <p className="mb-4 text-sm font-medium text-muted-foreground">
-                    Previews open in a new tab.
+                    Previews for this file type open in a new tab.
                   </p>
                   <Button onClick={handleOpenPreview}>
                     <ExternalLink className="mr-2 h-4 w-4" />
                     Open Preview
                   </Button>
                 </div>
+              )}
             </div>
 
             {document.keyInfo && document.keyInfo.length > 0 && (
