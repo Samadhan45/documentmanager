@@ -69,7 +69,7 @@ const STORAGE_KEY = 'certvault-ai-documents';
 const sampleDocument: Document = {
   id: 'sample-resume-1',
   fileName: 'Samadhan_Kadam_Resume.png',
-  fileUrl: 'https://storage.googleapis.com/static.aiprompt.io/Samadhan_Kadam_Resume.png',
+  fileUrl: 'https://placehold.co/850x1100.png',
   fileType: 'image/png',
   category: 'Employment',
   metadata: {
