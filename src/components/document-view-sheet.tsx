@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import {ScrollArea} from './ui/scroll-area';
 import {Button} from './ui/button';
-import {Download, Copy, Check, Trash2} from 'lucide-react';
+import {Download, Copy, Check, Trash2, ExternalLink} from 'lucide-react';
 import type {Document} from '@/lib/types';
 import {Badge} from './ui/badge';
 import React, {useState} from 'react';
@@ -115,11 +115,21 @@ export default function DocumentViewSheet({
                   objectFit="contain"
                 />
               ) : (
-                <iframe
-                  src={document.fileUrl}
-                  className="h-full w-full"
-                  title={document.fileName}
-                />
+                <div className="flex h-full w-full flex-col items-center justify-center bg-muted/50 p-4 text-center">
+                  <p className="mb-4 text-sm font-medium text-muted-foreground">
+                    PDF previews open in a new tab.
+                  </p>
+                  <Button asChild>
+                    <a
+                      href={document.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Open Preview
+                    </a>
+                  </Button>
+                </div>
               )}
             </div>
 
@@ -204,4 +214,3 @@ export default function DocumentViewSheet({
     </Sheet>
   );
 }
- 
