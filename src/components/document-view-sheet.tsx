@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -145,6 +146,16 @@ export default function DocumentViewSheet({
               className="aspect-[8.5/11] w-full overflow-hidden rounded-lg border flex items-center justify-center bg-muted/50 p-4 text-center"
               data-ai-hint="resume professional"
             >
+              {document.fileType.startsWith('image/') ? (
+                 <Image
+                  src={document.fileUrl}
+                  alt={document.fileName}
+                  width={850}
+                  height={1100}
+                  priority
+                  className="h-full w-full object-contain"
+                />
+              ) : (
                <div className="flex h-full w-full flex-col items-center justify-center">
                   <p className="mb-4 text-sm font-medium text-muted-foreground">
                     Previews open in a new tab.
@@ -154,6 +165,7 @@ export default function DocumentViewSheet({
                     Open Preview
                   </Button>
                 </div>
+              )}
             </div>
 
             {document.keyInfo && document.keyInfo.length > 0 && (
