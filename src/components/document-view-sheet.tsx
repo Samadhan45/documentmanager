@@ -142,8 +142,8 @@ export default function DocumentViewSheet({
                 <Image
                   src={document.fileUrl}
                   alt={document.fileName}
-                  layout="fill"
-                  objectFit="contain"
+                  fill
+                  className="object-contain"
                 />
               ) : (
                 <div className="flex h-full w-full flex-col items-center justify-center bg-muted/50 p-4 text-center">
