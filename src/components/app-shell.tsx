@@ -73,27 +73,27 @@ const blobUrlMap = new Map<string, string>();
 
 const sampleDocument: Document = {
   id: 'sample-resume-1',
-  fileName: 'Samadhan_Kadam_Resume.png',
-  fileUrl: 'https://firebasestudio-hosting-f07d2.web.app/Samadhan_Kadam_Resume.png',
+  fileName: 'John_Doe_Resume.png',
+  fileUrl: 'https://placehold.co/850x1100.png',
   fileType: 'image/png',
   category: 'Employment',
   metadata: {
     summary:
-      'A dedicated and skilled Java Full Stack Developer with a strong foundation in building scalable and efficient web applications. Proficient in both front-end and back-end technologies, with hands-on experience in React.js, Next.js, and Java-based frameworks. Adept at problem-solving, debugging, and collaborating in fast-paced environments. A quick learner with a passion for mastering new technologies and delivering high-quality software solutions.',
+      'A highly skilled and motivated professional with experience in software development and project management. Proven ability to lead teams and deliver high-quality products on time and within budget. Seeking to leverage technical expertise and leadership skills in a challenging new role.',
     documentType: 'Resume',
-    name: 'Samadhan Vilas Kadam',
-    location: 'Pune, India',
+    name: 'John Doe',
+    location: 'San Francisco, CA',
     issuingAuthority: 'Self-published',
   },
   keyInfo: [
-    {label: 'Email', value: 'samadhankadam002@gmail.com'},
-    {label: 'Phone', value: '+91 8010792529'},
-    {label: 'GitHub', value: 'https://github.com/Samadhan45'},
-    {label: 'LinkedIn', value: 'https://linkedin.com/in/samadhan1'},
-    {label: 'Portfolio', value: 'https://samadhan-zeta.vercel.app'},
-    {label: 'Primary Skills', value: 'Java, Python, C++, React.js, Next.js'},
-    {label: 'Backend Technologies', value: 'Django, Node.js'},
-    {label: 'Databases', value: 'Oracle SQL, PostgreSQL, MongoDB'},
+    {label: 'Email', value: 'john.doe@example.com'},
+    {label: 'Phone', value: '123-456-7890'},
+    {label: 'Website', value: 'johndoe.dev'},
+    {label: 'LinkedIn', value: 'linkedin.com/in/johndoe'},
+    {
+      label: 'Primary Skills',
+      value: 'React, Node.js, TypeScript, Project Management',
+    },
   ],
   createdAt: new Date().toISOString(),
 };
@@ -147,9 +147,11 @@ export default function AppShell() {
 
         // Prepare docs for storage by removing blob URLs.
         const docsToStore = documents.map(doc => {
+          const { fileUrl, ...rest } = doc;
+          // Only store docs that don't have a blob URL (i.e., the sample doc)
+          // or store the doc without the fileUrl if it's a blob.
           if (doc.fileUrl.startsWith('blob:')) {
-            const { fileUrl, ...rest } = doc;
-            return rest; // fileUrl is omitted entirely for storage.
+            return rest;
           }
           return doc;
         });
@@ -162,9 +164,15 @@ export default function AppShell() {
         }
       } catch (error) {
         console.error('Failed to save documents to localStorage', error);
+        toast({
+          title: "We're very sorry about this.",
+          description:
+            'We encountered an issue saving your documents. Please try again.',
+          variant: 'destructive',
+        });
       }
     }
-  }, [documents, isLoading]);
+  }, [documents, isLoading, toast]);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -498,5 +506,3 @@ export default function AppShell() {
     </SidebarProvider>
   );
 }
-
-    
