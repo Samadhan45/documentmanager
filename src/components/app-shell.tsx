@@ -69,8 +69,7 @@ const STORAGE_KEY = 'certvault-ai-documents';
 const sampleDocument: Document = {
   id: 'sample-doc-1',
   fileName: 'Sample University Diploma.png',
-  fileUrl:
-    'https://storage.googleapis.com/fsm-media-fe-prod/1/9/19e95977-99e6-42f2-8c9a-41f238b77626.webp',
+  fileUrl: 'https://placehold.co/850x1100.png',
   fileType: 'image/png',
   category: 'Education',
   metadata: {
