@@ -21,11 +21,10 @@ export type SummarizeAndExtractMetadataInput = z.infer<typeof SummarizeAndExtrac
 
 const SummarizeAndExtractMetadataOutputSchema = z.object({
   summary: z.string().describe('A short summary of the document content.'),
-  documentType: z.string().describe('The type of the document (e.g., Education, ID, Medical).'),
-  name: z.string().describe('The name of the person or entity associated with the document.'),
-  dateOfIssue: z.string().describe('The date when the document was issued.'),
-  expiryDate: z.string().optional().describe('The expiry date of the document, if applicable.'),
-  issuingAuthority: z.string().describe('The organization or authority that issued the document.'),
+  documentType: z.string().describe('The type of the document (e.g., Resume, Invoice, Medical Record).'),
+  name: z.string().describe('The full name of the person or entity associated with the document.'),
+  location: z.string().optional().describe('The city and state, or country, mentioned in the document.'),
+  issuingAuthority: z.string().optional().describe('The organization or authority that issued the document (e.g., company name for a resume, university for a diploma).'),
 });
 export type SummarizeAndExtractMetadataOutput = z.infer<typeof SummarizeAndExtractMetadataOutputSchema>;
 
@@ -41,11 +40,12 @@ const summarizeAndExtractMetadataPrompt = ai.definePrompt({
 
   Analyze the document provided and extract the following information:
   - A short summary of the document content.
-  - The type of the document (e.g., Education, ID, Medical).
+  - The type of the document (e.g., Resume, ID, Medical).
   - The name of the person or entity associated with the document.
-  - The date when the document was issued.
-  - The expiry date of the document, if applicable.
-  - The organization or authority that issued the document.
+  - The location (e.g., "San Francisco, CA") if present.
+  - The organization or authority that issued the document (e.g., the company name on a resume).
+
+  Do not extract dates like "date of issue" or "expiry date" unless they are part of the core document content.
 
   Document: {{media url=documentDataUri}}
   `,

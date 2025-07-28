@@ -77,10 +77,8 @@ const sampleDocument: Document = {
       'A comprehensive resume for John Doe, a Full Stack Software Engineer with over 5 years of experience specializing in building and scaling dynamic web applications. Proficient in front-end technologies like React and TypeScript, back-end development with Node.js and Python, and deploying on cloud platforms such as Google Cloud and AWS. A proven track record of delivering high-quality code, optimizing application performance, and collaborating effectively in agile environments. Seeking to leverage expertise in a challenging role to build innovative software solutions.',
     documentType: 'Resume',
     name: 'John Doe',
-    dateOfIssue: '2024-07-01',
-    issuingAuthority: 'John Doe',
-    experienceYears: '5+',
-    primaryRole: 'Full Stack Software Engineer',
+    location: 'San Francisco, CA',
+    issuingAuthority: 'Self-published',
   },
   keyInfo: [
     {label: 'Email', value: 'john.doe@email.com'},
