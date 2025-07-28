@@ -40,7 +40,7 @@ export function UploadDialog({
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
       toast({
-        title: 'Sorry, File is Too Large',
+        title: 'Sorry, the file is too large.',
         description: `We can only accept files smaller than ${MAX_FILE_SIZE_MB}MB. Please try a smaller file.`,
         variant: 'destructive',
       });
@@ -133,3 +133,5 @@ export function UploadDialog({
     </Dialog>
   );
 }
+
+    

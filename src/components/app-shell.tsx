@@ -21,7 +21,7 @@ import {
   LogOut,
   RotateCcw,
 } from 'lucide-react';
-import React, {useCallback, useEffect, useMemo, useState} from 'react';
+import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Button} from './ui/button';
 import {Input} from './ui/input';
 import {ThemeToggleButton} from './theme-toggle-button';
@@ -68,6 +68,8 @@ type SearchResult = {
 };
 
 const STORAGE_KEY = 'certvault-ai-documents';
+// In-memory map to store blob URLs, as they are session-specific and cannot be stringified.
+const blobUrlMap = new Map<string, string>();
 
 const sampleDocument: Document = {
   id: 'sample-resume-1',
@@ -112,42 +114,50 @@ export default function AppShell() {
   const {toast} = useToast();
 
   useEffect(() => {
-    // This effect now only runs once on mount to set initial state
     setIsLoading(true);
     try {
       const storedDocs = localStorage.getItem(STORAGE_KEY);
       if (storedDocs && JSON.parse(storedDocs).length > 0) {
-        setDocuments(JSON.parse(storedDocs));
+        const parsedDocs: Document[] = JSON.parse(storedDocs);
+        // We restore blob URLs from the in-memory map if they exist for the session.
+        const hydratedDocs = parsedDocs.map(doc => {
+          if (blobUrlMap.has(doc.id)) {
+            return { ...doc, fileUrl: blobUrlMap.get(doc.id)! };
+          }
+          return doc;
+        });
+        setDocuments(hydratedDocs);
       } else {
-        // If no documents are in storage, load the sample one.
         setDocuments([sampleDocument]);
       }
     } catch (error) {
       console.error('Failed to parse documents from localStorage', error);
-      setDocuments([sampleDocument]); // Load sample on error as well
+      setDocuments([sampleDocument]); 
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    // This effect runs whenever documents change to update localStorage.
     if (!isLoading) {
       try {
-        const isSample =
+        const isSampleOnly =
           documents.length === 1 && documents[0].id === 'sample-resume-1';
 
+        // Prepare docs for storage by removing blob URLs.
         const docsToStore = documents.map(doc => {
-          // We don't store blob URLs as they are session-specific and cause quota errors
           if (doc.fileUrl.startsWith('blob:')) {
-            const {fileUrl, ...rest} = doc;
-            return {...rest, fileUrl: ''}; // Store an empty string so it can be rehydrated
+            const { fileUrl, ...rest } = doc;
+            return rest; // fileUrl is omitted entirely for storage.
           }
           return doc;
         });
-
-        if (!isSample) {
+        
+        if (!isSampleOnly && documents.length > 0) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(docsToStore));
         } else {
+          // If only sample doc is left or no docs, clear storage.
           localStorage.removeItem(STORAGE_KEY);
         }
       } catch (error) {
@@ -232,11 +242,13 @@ export default function AppShell() {
         const {keyInfo} = await extractKeyInfo(keyInfoInput);
         
         const fileUrl = URL.createObjectURL(file);
+        const docId = crypto.randomUUID();
+        blobUrlMap.set(docId, fileUrl); // Store blob URL in memory
 
         const newDocument: Document = {
-          id: crypto.randomUUID(),
+          id: docId,
           fileName: file.name,
-          fileUrl: fileUrl, // Use blob URL for preview
+          fileUrl: fileUrl, // Use blob URL for preview in the current session
           fileType: file.type,
           category: CATEGORIES.find(c => c === category) || ('Other' as const),
           metadata,
@@ -257,7 +269,7 @@ export default function AppShell() {
       } catch (error) {
         console.error('AI processing failed:', error);
         toast({
-          title: 'Sorry, Upload Failed',
+          title: 'We are sorry, the upload failed.',
           description:
             'We encountered an error processing your document with AI. Please try again.',
           variant: 'destructive',
@@ -271,28 +283,29 @@ export default function AppShell() {
 
   const handleDeleteDocument = useCallback(
     (documentId: string) => {
-      setDocuments(prev => {
-        const docToDelete = prev.find(doc => doc.id === documentId);
-        if (docToDelete && docToDelete.fileUrl.startsWith('blob:')) {
-          URL.revokeObjectURL(docToDelete.fileUrl);
-        }
-        return prev.filter(doc => doc.id !== documentId)
-      });
+      const docToDelete = documents.find(doc => doc.id === documentId);
+      if (docToDelete && docToDelete.fileUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(docToDelete.fileUrl); // Clean up blob URL from memory
+        blobUrlMap.delete(documentId);
+      }
+      setDocuments(prev => prev.filter(doc => doc.id !== documentId));
       setActiveDocument(null);
       toast({
         title: 'Document Deleted',
         description: 'The document has been successfully deleted.',
       });
     },
-    [toast]
+    [documents, toast]
   );
 
   const handleResetData = () => {
+    // Clear all blob URLs from memory
     documents.forEach(doc => {
       if (doc.fileUrl.startsWith('blob:')) {
         URL.revokeObjectURL(doc.fileUrl);
       }
     });
+    blobUrlMap.clear();
     localStorage.removeItem(STORAGE_KEY);
     setDocuments([sampleDocument]);
     toast({
@@ -485,3 +498,5 @@ export default function AppShell() {
     </SidebarProvider>
   );
 }
+
+    

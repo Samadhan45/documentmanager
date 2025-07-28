@@ -97,14 +97,13 @@ export default function DocumentViewSheet({
 
   const isSample = document.id === 'sample-resume-1';
   const isImage = document.fileType.startsWith('image/');
-  const isBlobUrl = document.fileUrl.startsWith('blob:');
 
   const metadataEntries = Object.entries(document.metadata).filter(
     ([key]) => key !== 'summary'
   );
 
   const handleOpenPreview = () => {
-    if (!document) return;
+    if (!document || !document.fileUrl) return;
     window.open(document.fileUrl, '_blank');
   };
 
@@ -128,7 +127,7 @@ export default function DocumentViewSheet({
               className="aspect-[8.5/11] w-full overflow-hidden rounded-lg border flex items-center justify-center bg-muted/50 p-1"
               data-ai-hint="resume professional"
             >
-              {isImage ? (
+              {isImage && document.fileUrl ? (
                 <Image
                   src={document.fileUrl}
                   alt={document.fileName}
@@ -139,12 +138,14 @@ export default function DocumentViewSheet({
               ) : (
                  <div className="flex h-full w-full flex-col items-center justify-center text-center">
                   <p className="mb-4 text-sm font-medium text-muted-foreground">
-                    Previews for this file type open in a new tab.
+                    {document.fileUrl ? "Previews for this file type open in a new tab." : "Preview not available after refresh."}
                   </p>
-                  <Button onClick={handleOpenPreview}>
-                    <ExternalLink className="mr-2 h-4 w-4" />
-                    Open Preview
-                  </Button>
+                  {document.fileUrl && (
+                    <Button onClick={handleOpenPreview}>
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Open Preview
+                    </Button>
+                  )}
                 </div>
               )}
             </div>
@@ -184,7 +185,7 @@ export default function DocumentViewSheet({
           </div>
         </ScrollArea>
         <div className="flex gap-2 border-t p-4">
-          <Button className="w-full" asChild>
+          <Button className="w-full" asChild disabled={!document.fileUrl}>
             <a href={document.fileUrl} download={document.fileName}>
               <Download className="mr-2 h-4 w-4" />
               Download
@@ -218,3 +219,5 @@ export default function DocumentViewSheet({
     </Sheet>
   );
 }
+
+    
