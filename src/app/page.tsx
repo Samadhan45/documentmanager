@@ -57,10 +57,7 @@ export default function Home() {
           variants={itemVariants}
         >
           <Button asChild size="lg">
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
-          <Button variant="outline" asChild size="lg">
-            <Link href="/sign-up">Sign Up</Link>
+            <Link href="/dashboard">Continue as Guest</Link>
           </Button>
         </motion.div>
       </motion.div>

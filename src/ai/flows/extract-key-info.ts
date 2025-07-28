@@ -24,12 +24,12 @@ const ExtractKeyInfoOutputSchema = z.object({
         label: z
           .string()
           .describe(
-            'A descriptive label for the extracted information (e.g., "Account Number", "Confirmation Code").'
+            'A descriptive label for the extracted information (e.g., "Email", "Phone", "Website").'
           ),
         value: z
           .string()
           .describe(
-            'The extracted value from the document (e.g., "123-456-7890", "XYZ-2024").'
+            'The extracted value from the document (e.g., "john.doe@email.com", "(123) 456-7890", "johndoe.dev").'
           ),
       })
     )
@@ -51,16 +51,17 @@ const prompt = ai.definePrompt({
   output: {schema: ExtractKeyInfoOutputSchema},
   prompt: `You are an AI assistant that extracts key information from documents.
 
-  Analyze the document text provided and identify important numbers, codes, identifiers, and other critical data points. For each piece of information, create a clear, concise label and extract the corresponding value.
+  Analyze the document text provided and identify important contact information, identifiers, skills, and critical data points. For each piece of information, create a clear, concise label and extract the corresponding value.
 
   Examples of information to extract:
-  - Member ID
-  - Account Number
-  - Invoice Number
-  - Reference Code
-  - Policy Number
-  - Dates
-  - Amounts
+  - Email Address
+  - Phone Number
+  - Website or Portfolio URL
+  - LinkedIn Profile
+  - GitHub Profile
+  - Primary Skills
+  - Backend Technologies
+  - Databases
 
   Document Text:
   {{{documentText}}}

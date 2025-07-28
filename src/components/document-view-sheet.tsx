@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -20,11 +21,12 @@ import {
 } from '@/components/ui/alert-dialog';
 import {ScrollArea} from './ui/scroll-area';
 import {Button} from './ui/button';
-import {Download, Copy, Check, Trash2} from 'lucide-react';
+import {Download, Copy, Check, Trash2, ExternalLink} from 'lucide-react';
 import type {Document} from '@/lib/types';
 import {Badge} from './ui/badge';
 import React, {useState} from 'react';
 import {useToast} from '@/hooks/use-toast';
+import Image from 'next/image';
 
 interface DocumentViewSheetProps {
   document: Document | null;
@@ -40,9 +42,18 @@ interface MetadataItemProps {
 
 function MetadataItem({label, value}: MetadataItemProps) {
   if (!value) return null;
+
+  // Function to convert camelCase to Title Case
+  const toTitleCase = (str: string) => {
+    const result = str.replace(/([A-Z])/g, ' $1');
+    return result.charAt(0).toUpperCase() + result.slice(1);
+  };
+
   return (
     <div>
-      <p className="text-sm font-medium text-muted-foreground">{label}</p>
+      <p className="text-sm font-medium text-muted-foreground">
+        {toTitleCase(label)}
+      </p>
       <p className="text-base">{value}</p>
     </div>
   );
@@ -84,6 +95,18 @@ export default function DocumentViewSheet({
 }: DocumentViewSheetProps) {
   if (!document) return null;
 
+  const isSample = document.id === 'sample-resume-1';
+  const isImage = document.fileType.startsWith('image/');
+
+  const metadataEntries = Object.entries(document.metadata).filter(
+    ([key]) => key !== 'summary'
+  );
+
+  const handleOpenPreview = () => {
+    if (!document || !document.fileUrl) return;
+    window.open(document.fileUrl, '_blank');
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-full flex-col sm:max-w-lg">
@@ -94,24 +117,36 @@ export default function DocumentViewSheet({
           <SheetDescription asChild>
             <div>
               <Badge variant="secondary">{document.category}</Badge>
+              {isSample && <Badge className="ml-2">Sample</Badge>}
             </div>
           </SheetDescription>
         </SheetHeader>
         <ScrollArea className="flex-1">
           <div className="space-y-6 p-1 pr-6">
-            <div className="relative aspect-[8.5/11] w-full overflow-hidden rounded-lg border">
-              {document.fileType.startsWith('image/') ? (
-                <img
+            <div
+              className="aspect-[8.5/11] w-full overflow-hidden rounded-lg border flex items-center justify-center bg-muted/50 p-1"
+              data-ai-hint="resume professional"
+            >
+              {isImage && document.fileUrl ? (
+                <Image
                   src={document.fileUrl}
                   alt={document.fileName}
+                  width={850}
+                  height={1100}
                   className="h-full w-full object-contain"
                 />
               ) : (
-                <iframe
-                  src={document.fileUrl}
-                  className="h-full w-full"
-                  title={document.fileName}
-                />
+                 <div className="flex h-full w-full flex-col items-center justify-center text-center">
+                  <p className="mb-4 text-sm font-medium text-muted-foreground">
+                    {document.fileUrl ? "Previews for this file type open in a new tab." : "Preview not available after refresh."}
+                  </p>
+                  {document.fileUrl && (
+                    <Button onClick={handleOpenPreview}>
+                      <ExternalLink className="mr-2 h-4 w-4" />
+                      Open Preview
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -137,32 +172,20 @@ export default function DocumentViewSheet({
               </p>
             </div>
 
-            <div>
-              <h3 className="mb-4 text-lg font-semibold">Details</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <MetadataItem
-                  label="Document Type"
-                  value={document.metadata.documentType}
-                />
-                <MetadataItem label="Name" value={document.metadata.name} />
-                <MetadataItem
-                  label="Date of Issue"
-                  value={document.metadata.dateOfIssue}
-                />
-                <MetadataItem
-                  label="Expiry Date"
-                  value={document.metadata.expiryDate}
-                />
-                <MetadataItem
-                  label="Issuing Authority"
-                  value={document.metadata.issuingAuthority}
-                />
+            {metadataEntries.length > 0 && (
+              <div>
+                <h3 className="mb-4 text-lg font-semibold">Details</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  {metadataEntries.map(([key, value]) => (
+                    <MetadataItem key={key} label={key} value={value} />
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </ScrollArea>
         <div className="flex gap-2 border-t p-4">
-          <Button className="w-full" asChild>
+          <Button className="w-full" asChild disabled={!document.fileUrl}>
             <a href={document.fileUrl} download={document.fileName}>
               <Download className="mr-2 h-4 w-4" />
               Download
@@ -170,7 +193,7 @@ export default function DocumentViewSheet({
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="destructive" size="icon">
+              <Button variant="destructive" size="icon" disabled={isSample}>
                 <Trash2 className="h-4 w-4" />
                 <span className="sr-only">Delete</span>
               </Button>

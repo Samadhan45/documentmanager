@@ -15,9 +15,9 @@ export interface DocumentMetadata {
   summary: string;
   documentType: string;
   name: string;
-  dateOfIssue: string;
-  expiryDate?: string;
-  issuingAuthority: string;
+  location?: string;
+  issuingAuthority?: string;
+  [key: string]: string | undefined;
 }
 
 export interface KeyInfo {

@@ -1,8 +1,10 @@
+
 'use client';
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
@@ -11,7 +13,14 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from '@/components/ui/sidebar';
-import {Home, Loader2, Plus, Search, LogOut} from 'lucide-react';
+import {
+  Home,
+  Loader2,
+  Plus,
+  Search,
+  LogOut,
+  RotateCcw,
+} from 'lucide-react';
 import React, {useCallback, useEffect, useMemo, useState} from 'react';
 import {Button} from './ui/button';
 import {Input} from './ui/input';
@@ -40,6 +49,18 @@ import {
 } from '@/ai/flows/document-search';
 import DocumentViewSheet from './document-view-sheet';
 import Link from 'next/link';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from './ui/alert-dialog';
+import {AboutDialog} from './about-dialog';
 
 type SearchResult = {
   documentId: string;
@@ -47,6 +68,43 @@ type SearchResult = {
 };
 
 const STORAGE_KEY = 'certvault-ai-documents';
+// In-memory map to store blob URLs, as they are session-specific and cannot be stringified.
+const blobUrlMap = new Map<string, string>();
+
+const sampleDocument: Document = {
+  id: 'sample-resume-1',
+  fileName: 'Samadhan_Kadam_Resume.png',
+  fileUrl: 'https://drive.google.com/uc?export=view&id=14UBw_h71P4dNSJdVUS3CbwY4ixcFyjZb',
+  fileType: 'image/png',
+  category: 'Employment',
+  metadata: {
+    summary:
+      'A highly skilled and motivated Java Full Stack Developer with experience in building and deploying scalable web applications. Proven ability to work with modern technologies to deliver high-quality software solutions. Seeking to leverage technical expertise in a challenging new role.',
+    documentType: 'Resume',
+    name: 'Samadhan Vilas Kadam',
+    location: 'Pune, India',
+    issuingAuthority: 'Self-published',
+  },
+  keyInfo: [
+    {label: 'Website', value: 'samadhan-zeta.vercel.app'},
+    {label: 'LinkedIn', value: 'linkedin.com/in/samadhan1'},
+    {label: 'GitHub', value: 'github.com/Samadhan45'},
+    {
+      label: 'Primary Skills',
+      value: 'Java, Spring Boot, React, Next.js, TypeScript',
+    },
+    {
+      label: 'Backend Technologies',
+      value: 'Java, Spring, Hibernate, REST APIs',
+    },
+     {
+      label: 'Databases',
+      value: 'MySQL, MongoDB',
+    },
+  ],
+  createdAt: new Date().toISOString(),
+};
+
 
 export default function AppShell() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -63,31 +121,65 @@ export default function AppShell() {
   const {toast} = useToast();
 
   useEffect(() => {
+    setIsLoading(true);
     try {
       const storedDocs = localStorage.getItem(STORAGE_KEY);
-      if (storedDocs) {
-        setDocuments(JSON.parse(storedDocs));
+      if (storedDocs && JSON.parse(storedDocs).length > 0) {
+        const parsedDocs: Document[] = JSON.parse(storedDocs);
+        // We restore blob URLs from the in-memory map if they exist for the session.
+        const hydratedDocs = parsedDocs.map(doc => {
+          if (blobUrlMap.has(doc.id)) {
+            return { ...doc, fileUrl: blobUrlMap.get(doc.id)! };
+          }
+          return doc;
+        });
+        setDocuments(hydratedDocs);
+      } else {
+        setDocuments([sampleDocument]);
       }
     } catch (error) {
       console.error('Failed to parse documents from localStorage', error);
-      toast({
-        title: 'Error',
-        description: 'Could not load your saved documents.',
-        variant: 'destructive',
-      });
+      setDocuments([sampleDocument]); 
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, [toast]);
+  }, []);
 
   useEffect(() => {
+    // This effect runs whenever documents change to update localStorage.
     if (!isLoading) {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
+        const isSampleOnly =
+          documents.length === 1 && documents[0].id === 'sample-resume-1';
+
+        // Prepare docs for storage by removing blob URLs.
+        const docsToStore = documents.map(doc => {
+          const { fileUrl, ...rest } = doc;
+          // Only store docs that don't have a blob URL (i.e., the sample doc)
+          // or store the doc without the fileUrl if it's a blob.
+          if (doc.fileUrl.startsWith('blob:')) {
+            return rest;
+          }
+          return doc;
+        });
+        
+        if (!isSampleOnly && documents.length > 0) {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(docsToStore));
+        } else {
+          // If only sample doc is left or no docs, clear storage.
+          localStorage.removeItem(STORAGE_KEY);
+        }
       } catch (error) {
         console.error('Failed to save documents to localStorage', error);
+        toast({
+          title: "We're very sorry about this.",
+          description:
+            'We encountered an issue saving your documents. Please try again.',
+          variant: 'destructive',
+        });
       }
     }
-  }, [documents, isLoading]);
+  }, [documents, isLoading, toast]);
 
   useEffect(() => {
     if (!searchQuery) {
@@ -96,12 +188,11 @@ export default function AppShell() {
       return;
     }
 
-    setIsSearching(true);
-    const handler = setTimeout(async () => {
+    const performSearch = async () => {
       if (documents.length === 0) {
-        setIsSearching(false);
         return;
       }
+      setIsSearching(true);
       try {
         const input: DocumentSearchInput = {
           query: searchQuery,
@@ -115,21 +206,32 @@ export default function AppShell() {
       } catch (error) {
         console.error('AI search failed:', error);
         toast({
-          title: 'Search Failed',
+          title: 'Sorry, Search Failed',
           description:
-            'The AI search could not be completed. Please try again.',
+            'We encountered an issue with the AI search. Please try again.',
           variant: 'destructive',
         });
         setSearchResults([]);
       } finally {
         setIsSearching(false);
       }
-    }, 500); // Debounce search
+    };
+
+    const handler = setTimeout(performSearch, 500); // Debounce search
 
     return () => {
       clearTimeout(handler);
     };
   }, [searchQuery, documents, toast]);
+
+  const fileToDataUri = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
 
   const handleFileUpload = useCallback(
     async (file: File) => {
@@ -137,54 +239,54 @@ export default function AppShell() {
       setUploadDialogOpen(false);
 
       try {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async () => {
-          const dataUri = reader.result as string;
+        const dataUri = await fileToDataUri(file);
 
-          const metadataInput: SummarizeAndExtractMetadataInput = {
-            documentDataUri: dataUri,
-          };
-          const metadata = await summarizeAndExtractMetadata(metadataInput);
+        const metadataInput: SummarizeAndExtractMetadataInput = {
+          documentDataUri: dataUri,
+        };
+        const metadata = await summarizeAndExtractMetadata(metadataInput);
 
-          const categorizationInput: AutoCategorizeDocumentsInput = {
-            documentText: metadata.summary,
-          };
-          const {category} = await autoCategorizeDocuments(categorizationInput);
+        const categorizationInput: AutoCategorizeDocumentsInput = {
+          documentText: metadata.summary,
+        };
+        const {category} = await autoCategorizeDocuments(categorizationInput);
 
-          const keyInfoInput: ExtractKeyInfoInput = {
-            documentText: metadata.summary,
-          };
-          const {keyInfo} = await extractKeyInfo(keyInfoInput);
+        const keyInfoInput: ExtractKeyInfoInput = {
+          documentText: metadata.summary,
+        };
+        const {keyInfo} = await extractKeyInfo(keyInfoInput);
+        
+        const fileUrl = URL.createObjectURL(file);
+        const docId = crypto.randomUUID();
+        blobUrlMap.set(docId, fileUrl); // Store blob URL in memory
 
-          const newDocument: Document = {
-            id: crypto.randomUUID(),
-            fileName: file.name,
-            fileUrl: dataUri,
-            fileType: file.type,
-            category:
-              CATEGORIES.find(c => c === category) || ('Other' as const),
-            metadata,
-            keyInfo,
-            createdAt: new Date().toISOString(),
-          };
-
-          setDocuments(prev => [newDocument, ...prev]);
-          toast({
-            title: 'Upload Successful',
-            description: `${file.name} has been processed and saved.`,
-          });
+        const newDocument: Document = {
+          id: docId,
+          fileName: file.name,
+          fileUrl: fileUrl, // Use blob URL for preview in the current session
+          fileType: file.type,
+          category: CATEGORIES.find(c => c === category) || ('Other' as const),
+          metadata,
+          keyInfo,
+          createdAt: new Date().toISOString(),
         };
 
-        reader.onerror = error => {
-          throw new Error('File could not be read.');
-        };
+        setDocuments(prev => {
+          const isSample =
+            prev.length === 1 && prev[0].id === 'sample-resume-1';
+          return isSample ? [newDocument] : [newDocument, ...prev];
+        });
+
+        toast({
+          title: 'Upload Successful',
+          description: `${file.name} has been processed and saved.`,
+        });
       } catch (error) {
         console.error('AI processing failed:', error);
         toast({
-          title: 'Upload Failed',
+          title: 'We are sorry, the upload failed.',
           description:
-            'There was an error processing your document with AI. Please try again.',
+            'We encountered an error processing your document with AI. Please try again.',
           variant: 'destructive',
         });
       } finally {
@@ -196,6 +298,11 @@ export default function AppShell() {
 
   const handleDeleteDocument = useCallback(
     (documentId: string) => {
+      const docToDelete = documents.find(doc => doc.id === documentId);
+      if (docToDelete && docToDelete.fileUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(docToDelete.fileUrl); // Clean up blob URL from memory
+        blobUrlMap.delete(documentId);
+      }
       setDocuments(prev => prev.filter(doc => doc.id !== documentId));
       setActiveDocument(null);
       toast({
@@ -203,8 +310,24 @@ export default function AppShell() {
         description: 'The document has been successfully deleted.',
       });
     },
-    [toast]
+    [documents, toast]
   );
+
+  const handleResetData = () => {
+    // Clear all blob URLs from memory
+    documents.forEach(doc => {
+      if (doc.fileUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(doc.fileUrl);
+      }
+    });
+    blobUrlMap.clear();
+    localStorage.removeItem(STORAGE_KEY);
+    setDocuments([sampleDocument]);
+    toast({
+      title: 'Data Cleared',
+      description: 'All local documents have been removed.',
+    });
+  };
 
   const filteredDocuments = useMemo(() => {
     let docs = documents;
@@ -221,21 +344,23 @@ export default function AppShell() {
         if (rankB === undefined) return -1;
         return rankA - rankB;
       });
-      // Filter out documents that are not in the search results
       docs = docs.filter(doc => rankedDocs.has(doc.id));
-    } else if (searchQuery && documents.length > 0) {
-      // If there's a search query but no results yet (e.g., during search), show nothing.
+    } else if (searchQuery && documents.length > 0 && !isSearching) {
       return [];
-    } else if (searchQuery && documents.length === 0) {
-      // If there's a search query and no documents at all, show no results.
+    } else if (searchQuery && isSearching) {
       return [];
     }
-
 
     return docs.filter(
       doc => activeCategory === 'All' || doc.category === activeCategory
     );
-  }, [documents, activeCategory, searchQuery, searchResults]);
+  }, [
+    documents,
+    activeCategory,
+    searchQuery,
+    searchResults,
+    isSearching,
+  ]);
 
   return (
     <SidebarProvider>
@@ -285,6 +410,9 @@ export default function AppShell() {
               })}
             </SidebarMenu>
           </SidebarContent>
+          <SidebarFooter>
+            <AboutDialog />
+          </SidebarFooter>
         </Sidebar>
         <SidebarInset>
           <header className="sticky top-0 z-10 flex h-16 items-center justify-between gap-4 border-b bg-background/80 px-4 backdrop-blur-sm sm:px-6">
@@ -316,8 +444,33 @@ export default function AppShell() {
                 </Button>
               </UploadDialog>
               <ThemeToggleButton />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <RotateCcw />
+                    <span className="sr-only">Reset Data</span>
+                  </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This action cannot be undone. This will permanently delete
+                      all your uploaded documents from this browser and restore
+                      the sample document.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={handleResetData}>
+                      Reset
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+
               <Button variant="outline" size="icon" asChild>
-                <Link href="/sign-in">
+                <Link href="/">
                   <LogOut />
                   <span className="sr-only">Log out</span>
                 </Link>

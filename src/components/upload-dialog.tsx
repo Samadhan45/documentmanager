@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -11,6 +12,7 @@ import {
 import {Button} from './ui/button';
 import {UploadCloud, Loader2} from 'lucide-react';
 import React, {useCallback, useState} from 'react';
+import {useToast} from '@/hooks/use-toast';
 
 interface UploadDialogProps {
   children: React.ReactNode;
@@ -20,6 +22,9 @@ interface UploadDialogProps {
   setIsOpen: (isOpen: boolean) => void;
 }
 
+const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
 export function UploadDialog({
   children,
   onFileUpload,
@@ -28,6 +33,21 @@ export function UploadDialog({
   setIsOpen,
 }: UploadDialogProps) {
   const [dragActive, setDragActive] = useState(false);
+  const {toast} = useToast();
+
+  const handleFile = (file: File | undefined) => {
+    if (!file) return;
+
+    if (file.size > MAX_FILE_SIZE_BYTES) {
+      toast({
+        title: 'Sorry, the file is too large.',
+        description: `We can only accept files smaller than ${MAX_FILE_SIZE_MB}MB. Please try a smaller file.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+    onFileUpload(file);
+  };
 
   const handleDrag = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -45,16 +65,17 @@ export function UploadDialog({
       e.stopPropagation();
       setDragActive(false);
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        onFileUpload(e.dataTransfer.files[0]);
+        handleFile(e.dataTransfer.files[0]);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [onFileUpload]
   );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     if (e.target.files && e.target.files[0]) {
-      onFileUpload(e.target.files[0]);
+      handleFile(e.target.files[0]);
     }
   };
 
@@ -95,7 +116,7 @@ export function UploadDialog({
                   or drag and drop
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  PDF, PNG, JPG or other image files
+                  PDF, PNG, JPG (MAX. {MAX_FILE_SIZE_MB}MB)
                 </p>
               </div>
             )}
@@ -112,3 +133,5 @@ export function UploadDialog({
     </Dialog>
   );
 }
+
+    
