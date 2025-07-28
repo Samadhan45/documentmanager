@@ -28,6 +28,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'accounts.google.com',
       },
+      {
+        protocol: 'https',
+        hostname: 'firebasestudio-hosting-f07d2.web.app',
+      },
     ],
   },
 };

@@ -69,12 +69,12 @@ const STORAGE_KEY = 'certvault-ai-documents';
 const sampleDocument: Document = {
   id: 'sample-resume-1',
   fileName: 'Samadhan_Kadam_Resume.png',
-  fileUrl: 'https://placehold.co/850x1100.png',
+  fileUrl: 'https://firebasestudio-hosting-f07d2.web.app/images/samadhan_kadam_resume.png',
   fileType: 'image/png',
   category: 'Employment',
   metadata: {
     summary:
-      'Highly skilled and motivated Java Developer with a strong foundation in building scalable and efficient full-stack applications. Proficient in a wide range of technologies including Java, C++, Python, React.js, and Next.js. Experienced in developing and maintaining robust backend systems using Django and Node.js, coupled with expertise in database management with Oracle SQL, PostgreSQL, and MongoDB. A quick learner with excellent debugging and problem-solving abilities, committed to writing clean, maintainable code and staying updated with the latest industry trends.',
+      'Java Developer with experience in building scalable full-stack apps using React.js and Next.js. Strong in debugging, problem-solving, and quick to learn new technologies.',
     documentType: 'Resume',
     name: 'Samadhan Vilas Kadam',
     location: 'Pune, India',
@@ -86,8 +86,9 @@ const sampleDocument: Document = {
     {label: 'GitHub', value: 'github.com/Samadhan45'},
     {label: 'LinkedIn', value: 'linkedin.com/in/samadhan1'},
     {label: 'Portfolio', value: 'samadhan-zeta.vercel.app'},
-    {label: 'Primary Skills', value: 'Java, C++, Python, React.js, Next.js'},
-    {label: 'Backend Technologies', value: 'Django, Node.js'},
+    {label: 'Programming Languages', value: 'Java, C++, Python'},
+    {label: 'Frontend Technologies', value: 'React.js, HTML5, CSS3, JavaScript'},
+    {label: 'Backend Technologies', value: 'Django, Node.js, Next.js'},
     {label: 'Databases', value: 'Oracle SQL, PostgreSQL, MongoDB'},
   ],
   createdAt: new Date().toISOString(),
