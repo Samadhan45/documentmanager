@@ -74,18 +74,23 @@ const sampleDocument: Document = {
   category: 'Employment',
   metadata: {
     summary:
-      'A comprehensive resume for John Doe, a Full Stack Software Engineer with over 5 years of experience in developing and scaling web applications. Proficient in React, Node.js, TypeScript, and cloud services like Google Cloud and AWS. Seeking to leverage expertise in a challenging software development role.',
+      'A comprehensive resume for John Doe, a Full Stack Software Engineer with over 5 years of experience specializing in building and scaling dynamic web applications. Proficient in front-end technologies like React and TypeScript, back-end development with Node.js and Python, and deploying on cloud platforms such as Google Cloud and AWS. A proven track record of delivering high-quality code, optimizing application performance, and collaborating effectively in agile environments. Seeking to leverage expertise in a challenging role to build innovative software solutions.',
     documentType: 'Resume',
     name: 'John Doe',
-    dateOfIssue: '2024-06-15',
+    dateOfIssue: '2024-07-01',
     issuingAuthority: 'John Doe',
+    experienceYears: '5+',
+    primaryRole: 'Full Stack Software Engineer',
   },
   keyInfo: [
     {label: 'Email', value: 'john.doe@email.com'},
     {label: 'Phone', value: '(123) 456-7890'},
     {label: 'Website', value: 'johndoe.dev'},
+    {label: 'LinkedIn', value: 'linkedin.com/in/johndoe'},
+    {label: 'Primary Skills', value: 'React, Node.js, TypeScript, GCP'},
+    {label: 'Secondary Skills', value: 'Python, SQL, Docker, Kubernetes'},
   ],
-  createdAt: new Date('2024-06-15T10:00:00Z').toISOString(),
+  createdAt: new Date('2024-07-01T10:00:00Z').toISOString(),
 };
 
 export default function AppShell() {
@@ -453,4 +458,3 @@ export default function AppShell() {
     </SidebarProvider>
   );
 }
- 
