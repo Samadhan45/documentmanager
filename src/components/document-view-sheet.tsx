@@ -100,6 +100,24 @@ export default function DocumentViewSheet({
     ([key]) => key !== 'summary'
   );
 
+  const handleOpenPdf = () => {
+    if (!document || !document.fileUrl.startsWith('data:application/pdf')) return;
+
+    // Convert data URI to blob
+    const byteString = atob(document.fileUrl.split(',')[1]);
+    const mimeString = document.fileUrl.split(',')[0].split(':')[1].split(';')[0];
+    const ab = new ArrayBuffer(byteString.length);
+    const ia = new Uint8Array(ab);
+    for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+    }
+    const blob = new Blob([ab], { type: mimeString });
+    const blobUrl = URL.createObjectURL(blob);
+    
+    // Open blob URL in a new tab
+    window.open(blobUrl, '_blank');
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
       <SheetContent className="flex w-full flex-col sm:max-w-lg">
@@ -132,15 +150,9 @@ export default function DocumentViewSheet({
                   <p className="mb-4 text-sm font-medium text-muted-foreground">
                     PDF previews open in a new tab.
                   </p>
-                  <Button asChild>
-                    <a
-                      href={document.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
+                  <Button onClick={handleOpenPdf}>
                       <ExternalLink className="mr-2 h-4 w-4" />
                       Open Preview
-                    </a>
                   </Button>
                 </div>
               )}
