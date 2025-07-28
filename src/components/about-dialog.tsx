@@ -91,13 +91,16 @@ export function AboutDialog() {
                   cloud database. Clearing your browser data will remove them.
                 </li>
                 <li>
+                  <strong>File Size Limit:</strong> There is a 5MB limit per
+                  file to ensure application performance.
+                </li>
+                <li>
                   <strong>No User Accounts:</strong> The app currently operates in
                   a "guest mode" without user authentication or accounts.
                 </li>
                 <li>
-                  <strong>Limited File Previews:</strong> Previews are optimized
-                  for images and PDFs. Other file types may not render correctly
-                  and will default to opening in a new tab.
+                  <strong>Limited File Previews:</strong> Previews for all file
+                  types will open in a new tab for reliability.
                 </li>
               </ul>
             </InfoSection>
