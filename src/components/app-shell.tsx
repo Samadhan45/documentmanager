@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -132,8 +133,19 @@ export default function AppShell() {
         // We only save to local storage if it's not the initial sample document
         const isSample =
           documents.length === 1 && documents[0].id === 'sample-resume-1';
+
+        // Create a serializable version of documents, excluding non-storable data
+        const docsToStore = documents.map(doc => {
+           // We don't store blob URLs as they are session-specific
+          if (doc.fileUrl.startsWith('blob:')) {
+            const { fileUrl, ...rest } = doc;
+            return { ...rest, fileUrl: '' }; // Store an empty string or a placeholder
+          }
+          return doc;
+        });
+
         if (!isSample) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(docsToStore));
         } else {
           // If we are down to just the sample document, make sure storage is clear
           localStorage.removeItem(STORAGE_KEY);
@@ -187,60 +199,62 @@ export default function AppShell() {
     };
   }, [searchQuery, documents, toast]);
 
+  const fileToDataUri = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleFileUpload = useCallback(
     async (file: File) => {
       setIsUploading(true);
       setUploadDialogOpen(false);
 
       try {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = async () => {
-          const dataUri = reader.result as string;
+        const dataUri = await fileToDataUri(file);
 
-          const metadataInput: SummarizeAndExtractMetadataInput = {
-            documentDataUri: dataUri,
-          };
-          const metadata = await summarizeAndExtractMetadata(metadataInput);
+        const metadataInput: SummarizeAndExtractMetadataInput = {
+          documentDataUri: dataUri,
+        };
+        const metadata = await summarizeAndExtractMetadata(metadataInput);
 
-          const categorizationInput: AutoCategorizeDocumentsInput = {
-            documentText: metadata.summary,
-          };
-          const {category} = await autoCategorizeDocuments(categorizationInput);
+        const categorizationInput: AutoCategorizeDocumentsInput = {
+          documentText: metadata.summary,
+        };
+        const {category} = await autoCategorizeDocuments(categorizationInput);
 
-          const keyInfoInput: ExtractKeyInfoInput = {
-            documentText: metadata.summary,
-          };
-          const {keyInfo} = await extractKeyInfo(keyInfoInput);
+        const keyInfoInput: ExtractKeyInfoInput = {
+          documentText: metadata.summary,
+        };
+        const {keyInfo} = await extractKeyInfo(keyInfoInput);
+        
+        // Use object URL for previewing, which is session-based and lightweight
+        const fileUrl = URL.createObjectURL(file);
 
-          const newDocument: Document = {
-            id: crypto.randomUUID(),
-            fileName: file.name,
-            fileUrl: dataUri,
-            fileType: file.type,
-            category:
-              CATEGORIES.find(c => c === category) || ('Other' as const),
-            metadata,
-            keyInfo,
-            createdAt: new Date().toISOString(),
-          };
-
-          // If the only document is the sample one, replace it. Otherwise, add to the list.
-          setDocuments(prev => {
-            const isSample =
-              prev.length === 1 && prev[0].id === 'sample-resume-1';
-            return isSample ? [newDocument] : [newDocument, ...prev];
-          });
-
-          toast({
-            title: 'Upload Successful',
-            description: `${file.name} has been processed and saved.`,
-          });
+        const newDocument: Document = {
+          id: crypto.randomUUID(),
+          fileName: file.name,
+          fileUrl: fileUrl, // Use blob URL for preview
+          fileType: file.type,
+          category: CATEGORIES.find(c => c === category) || ('Other' as const),
+          metadata,
+          keyInfo,
+          createdAt: new Date().toISOString(),
         };
 
-        reader.onerror = error => {
-          throw new Error('File could not be read.');
-        };
+        setDocuments(prev => {
+          const isSample =
+            prev.length === 1 && prev[0].id === 'sample-resume-1';
+          return isSample ? [newDocument] : [newDocument, ...prev];
+        });
+
+        toast({
+          title: 'Upload Successful',
+          description: `${file.name} has been processed and saved.`,
+        });
       } catch (error) {
         console.error('AI processing failed:', error);
         toast({
@@ -258,7 +272,13 @@ export default function AppShell() {
 
   const handleDeleteDocument = useCallback(
     (documentId: string) => {
-      setDocuments(prev => prev.filter(doc => doc.id !== documentId));
+      setDocuments(prev => {
+        const docToDelete = prev.find(doc => doc.id === documentId);
+        if (docToDelete && docToDelete.fileUrl.startsWith('blob:')) {
+          URL.revokeObjectURL(docToDelete.fileUrl);
+        }
+        return prev.filter(doc => doc.id !== documentId)
+      });
       setActiveDocument(null);
       toast({
         title: 'Document Deleted',
@@ -270,6 +290,11 @@ export default function AppShell() {
 
   const handleResetData = () => {
     localStorage.removeItem(STORAGE_KEY);
+    documents.forEach(doc => {
+      if (doc.fileUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(doc.fileUrl);
+      }
+    });
     setDocuments([sampleDocument]);
     toast({
       title: 'Data Cleared',

@@ -97,6 +97,7 @@ export default function DocumentViewSheet({
 
   const isSample = document.id === 'sample-resume-1';
   const isImage = document.fileType.startsWith('image/');
+  const isBlobUrl = document.fileUrl.startsWith('blob:');
 
   const metadataEntries = Object.entries(document.metadata).filter(
     ([key]) => key !== 'summary'
@@ -104,28 +105,8 @@ export default function DocumentViewSheet({
 
   const handleOpenPreview = () => {
     if (!document) return;
-
-    if (document.fileUrl.startsWith('data:')) {
-      // Convert data URI to blob
-      const byteString = atob(document.fileUrl.split(',')[1]);
-      const mimeString = document.fileUrl
-        .split(',')[0]
-        .split(':')[1]
-        .split(';')[0];
-      const ab = new ArrayBuffer(byteString.length);
-      const ia = new Uint8Array(ab);
-      for (let i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-      const blob = new Blob([ab], {type: mimeString});
-      const blobUrl = URL.createObjectURL(blob);
-      window.open(blobUrl, '_blank');
-    } else {
-      // For direct URLs
-      window.open(document.fileUrl, '_blank');
-    }
+    window.open(document.fileUrl, '_blank');
   };
-
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
