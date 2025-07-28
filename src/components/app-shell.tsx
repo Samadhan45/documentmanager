@@ -67,25 +67,25 @@ type SearchResult = {
 const STORAGE_KEY = 'certvault-ai-documents';
 
 const sampleDocument: Document = {
-  id: 'sample-doc-1',
-  fileName: 'Sample University Diploma.png',
+  id: 'sample-resume-1',
+  fileName: 'John_Doe_Resume.png',
   fileUrl: 'https://placehold.co/850x1100.png',
   fileType: 'image/png',
-  category: 'Education',
+  category: 'Employment',
   metadata: {
     summary:
-      'This is a sample university diploma for Alex Doe from the University of Innovation, awarded on May 15, 2023. It represents a Bachelor of Science in Artificial Intelligence.',
-    documentType: 'Diploma',
-    name: 'Alex Doe',
-    dateOfIssue: '2023-05-15',
-    issuingAuthority: 'University of Innovation',
+      'A comprehensive resume for John Doe, a Full Stack Software Engineer with over 5 years of experience in developing and scaling web applications. Proficient in React, Node.js, TypeScript, and cloud services like Google Cloud and AWS. Seeking to leverage expertise in a challenging software development role.',
+    documentType: 'Resume',
+    name: 'John Doe',
+    dateOfIssue: '2024-06-15',
+    issuingAuthority: 'John Doe',
   },
   keyInfo: [
-    {label: 'Student ID', value: 'UOI-12345'},
-    {label: 'Degree', value: 'Bachelor of Science'},
-    {label: 'Major', value: 'Artificial Intelligence'},
+    {label: 'Email', value: 'john.doe@email.com'},
+    {label: 'Phone', value: '(123) 456-7890'},
+    {label: 'Website', value: 'johndoe.dev'},
   ],
-  createdAt: new Date('2023-05-15T10:00:00Z').toISOString(),
+  createdAt: new Date('2024-06-15T10:00:00Z').toISOString(),
 };
 
 export default function AppShell() {
@@ -126,7 +126,7 @@ export default function AppShell() {
       try {
         // We only save to local storage if it's not the initial sample document
         const isSample =
-          documents.length === 1 && documents[0].id === 'sample-doc-1';
+          documents.length === 1 && documents[0].id === 'sample-resume-1';
         if (!isSample) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(documents));
         } else {
@@ -223,7 +223,7 @@ export default function AppShell() {
           // If the only document is the sample one, replace it. Otherwise, add to the list.
           setDocuments(prev => {
             const isSample =
-              prev.length === 1 && prev[0].id === 'sample-doc-1';
+              prev.length === 1 && prev[0].id === 'sample-resume-1';
             return isSample ? [newDocument] : [newDocument, ...prev];
           });
 
@@ -453,3 +453,4 @@ export default function AppShell() {
     </SidebarProvider>
   );
 }
+ 

@@ -84,8 +84,8 @@ export default function DocumentViewSheet({
   onDelete,
 }: DocumentViewSheetProps) {
   if (!document) return null;
-  
-  const isSample = document.id === 'sample-doc-1';
+
+  const isSample = document.id === 'sample-resume-1';
 
   return (
     <Sheet open={isOpen} onOpenChange={onOpenChange}>
@@ -103,7 +103,10 @@ export default function DocumentViewSheet({
         </SheetHeader>
         <ScrollArea className="flex-1">
           <div className="space-y-6 p-1 pr-6">
-            <div className="relative aspect-[8.5/11] w-full overflow-hidden rounded-lg border">
+            <div
+              className="relative aspect-[8.5/11] w-full overflow-hidden rounded-lg border"
+              data-ai-hint="resume professional"
+            >
               {document.fileType.startsWith('image/') ? (
                 <Image
                   src={document.fileUrl}
@@ -201,3 +204,4 @@ export default function DocumentViewSheet({
     </Sheet>
   );
 }
+ 
