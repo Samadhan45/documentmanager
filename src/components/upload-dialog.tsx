@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -39,8 +40,8 @@ export function UploadDialog({
 
     if (file.size > MAX_FILE_SIZE_BYTES) {
       toast({
-        title: 'File Too Large',
-        description: `Please upload a file smaller than ${MAX_FILE_SIZE_MB}MB.`,
+        title: 'Sorry, File is Too Large',
+        description: `We can only accept files smaller than ${MAX_FILE_SIZE_MB}MB. Please try a smaller file.`,
         variant: 'destructive',
       });
       return;

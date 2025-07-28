@@ -72,7 +72,7 @@ const STORAGE_KEY = 'certvault-ai-documents';
 const sampleDocument: Document = {
   id: 'sample-resume-1',
   fileName: 'Samadhan_Kadam_Resume.png',
-  fileUrl: 'https://drive.google.com/uc?export=view&id=14UBw_h71P4dNSJdVUS3CbwY4ixcFyjZb',
+  fileUrl: 'https://firebasestudio-hosting-f07d2.web.app/Samadhan_Kadam_Resume.png',
   fileType: 'image/png',
   category: 'Employment',
   metadata: {
@@ -95,6 +95,7 @@ const sampleDocument: Document = {
   ],
   createdAt: new Date().toISOString(),
 };
+
 
 export default function AppShell() {
   const [documents, setDocuments] = useState<Document[]>([]);
@@ -132,16 +133,14 @@ export default function AppShell() {
   useEffect(() => {
     if (!isLoading) {
       try {
-        // We only save to local storage if it's not the initial sample document
         const isSample =
           documents.length === 1 && documents[0].id === 'sample-resume-1';
 
-        // Create a serializable version of documents, excluding non-storable data
         const docsToStore = documents.map(doc => {
-           // We don't store blob URLs as they are session-specific
+          // We don't store blob URLs as they are session-specific and cause quota errors
           if (doc.fileUrl.startsWith('blob:')) {
-            const { fileUrl, ...rest } = doc;
-            return { ...rest, fileUrl: '' }; // Store an empty string or a placeholder
+            const {fileUrl, ...rest} = doc;
+            return {...rest, fileUrl: ''}; // Store an empty string so it can be rehydrated
           }
           return doc;
         });
@@ -149,7 +148,6 @@ export default function AppShell() {
         if (!isSample) {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(docsToStore));
         } else {
-          // If we are down to just the sample document, make sure storage is clear
           localStorage.removeItem(STORAGE_KEY);
         }
       } catch (error) {
@@ -183,9 +181,9 @@ export default function AppShell() {
       } catch (error) {
         console.error('AI search failed:', error);
         toast({
-          title: 'Search Failed',
+          title: 'Sorry, Search Failed',
           description:
-            'The AI search could not be completed. Please try again.',
+            'We encountered an issue with the AI search. Please try again.',
           variant: 'destructive',
         });
         setSearchResults([]);
@@ -233,7 +231,6 @@ export default function AppShell() {
         };
         const {keyInfo} = await extractKeyInfo(keyInfoInput);
         
-        // Use object URL for previewing, which is session-based and lightweight
         const fileUrl = URL.createObjectURL(file);
 
         const newDocument: Document = {
@@ -260,9 +257,9 @@ export default function AppShell() {
       } catch (error) {
         console.error('AI processing failed:', error);
         toast({
-          title: 'Upload Failed',
+          title: 'Sorry, Upload Failed',
           description:
-            'There was an error processing your document with AI. Please try again.',
+            'We encountered an error processing your document with AI. Please try again.',
           variant: 'destructive',
         });
       } finally {
@@ -291,12 +288,12 @@ export default function AppShell() {
   );
 
   const handleResetData = () => {
-    localStorage.removeItem(STORAGE_KEY);
     documents.forEach(doc => {
       if (doc.fileUrl.startsWith('blob:')) {
         URL.revokeObjectURL(doc.fileUrl);
       }
     });
+    localStorage.removeItem(STORAGE_KEY);
     setDocuments([sampleDocument]);
     toast({
       title: 'Data Cleared',
